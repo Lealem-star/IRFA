@@ -160,5 +160,6 @@ IRFA/
 
 ---
 
-## 8. License
-Developed for the **Bahir Dar City Administration**, Amhara Region, Ethiopia.
+## 8. Institutional Ownership & Credits
+- **Institutional Owner:** **Bahir Dar Agriculture Directorate** (*ባህርዳር ግብርና መምሪያ*), Amhara Region, Ethiopia.
+- **Technology Partner:** **Enqopa Technologies PLC** (Powered & Developed by Enqopa Technologies PLC).
