@@ -23,6 +23,10 @@ uploads/farmers/*
 !uploads/farmers/.gitkeep
 server/uploads/farmers/*
 !server/uploads/farmers/.gitkeep
+uploads/avatars/*
+!uploads/avatars/.gitkeep
+server/uploads/avatars/*
+!server/uploads/avatars/.gitkeep
 test-passport-photo.jpg
 server/test-passport-photo.jpg
 

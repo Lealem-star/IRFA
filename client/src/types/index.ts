@@ -24,6 +24,7 @@ export interface User {
   username: string;
   email?: string | null;
   fullName: string;
+  avatarUrl?: string | null;
   role: UserRole;
   office?: {
     id: string;

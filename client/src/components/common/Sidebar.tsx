@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { UserAvatar, getRoleTitle } from './UserAvatar';
+import { ProfileModal } from '../profile/ProfileModal';
 import {
   LayoutDashboard,
   Users,
@@ -22,6 +24,7 @@ import {
 export const Sidebar: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   if (!user) return null;
 
@@ -147,28 +150,40 @@ export const Sidebar: React.FC = () => {
         ))}
       </nav>
 
-      {/* Bottom Section */}
-      <div className="pt-4 mt-auto border-t border-[#31435a] space-y-1">
-        <div className="px-3 py-2 text-xs text-[#8094af] flex items-center justify-between">
-          <span>{user.username}</span>
-          <span className="bg-[#244465] text-white text-[10px] px-2 py-0.5 rounded font-mono">
-            {user.role === 'AGRICULTURE_OFFICE'
-              ? 'AG'
-              : user.role === 'TRADE_OFFICE'
-                ? 'TR'
-                : user.role === 'STATION_ADMIN'
-                  ? 'FS'
-                  : 'SA'}
-          </span>
-        </div>
+      {/* Bottom User Profile Section */}
+      <div className="pt-4 mt-auto border-t border-[#31435a] space-y-2">
+        <button
+          type="button"
+          onClick={() => setIsProfileOpen(true)}
+          className="w-full text-left p-2.5 rounded-[12px] bg-[#1c324e]/80 hover:bg-[#244166] border border-[#314a6b]/60 transition-all flex items-center gap-2.5 group cursor-pointer"
+          title="Manage Account Profile"
+        >
+          <UserAvatar user={user} size="sm" showIndicator={true} />
+          <div className="overflow-hidden flex-1">
+            <div className="text-[12px] font-bold text-white truncate leading-tight group-hover:text-blue-200 transition-colors">
+              {user.fullName || user.username}
+            </div>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className="text-[10px] text-[#9bb1ce] font-mono truncate leading-none">
+                @{user.username}
+              </span>
+              <span className="bg-[#244465] text-[#93c5fd] text-[9px] px-1.5 py-0.5 rounded font-semibold border border-[#3b5d88]/40 leading-none">
+                {getRoleTitle(user.role).badge}
+              </span>
+            </div>
+          </div>
+        </button>
+
         <button
           onClick={logout}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-[10px] text-[13px] font-medium text-[#fca5a5] hover:bg-[#31202b] transition-colors"
+          className="flex items-center gap-3 w-full px-3 py-2 rounded-[10px] text-[12px] font-medium text-[#fca5a5] hover:bg-[#31202b] hover:text-[#fecaca] transition-colors"
         >
-          <LogOut size={16} />
+          <LogOut size={15} />
           <span>Sign Out</span>
         </button>
       </div>
+
+      <ProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
     </aside>
   );
 };

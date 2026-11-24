@@ -1,45 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { LogOut } from 'lucide-react';
+import { LogOut, ChevronDown } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
+import { UserAvatar, getRoleTitle } from './UserAvatar';
+import { ProfileModal } from '../profile/ProfileModal';
 
 export const Topbar: React.FC = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   if (!user) return null;
 
-  const roleMeta: Record<
-    string,
-    { label: string; initial: string; sub: string }
-  > = {
-    AGRICULTURE_OFFICE: {
-      label: 'Agriculture Office',
-      initial: 'AG',
-      sub: 'Farmer registry & allocation',
-    },
-    TRADE_OFFICE: {
-      label: 'Trade Office',
-      initial: 'TR',
-      sub: 'Authorization & station assignment',
-    },
-    STATION_ADMIN: {
-      label: user.fuelStation?.name || 'Fuel Station Admin',
-      initial: 'FS',
-      sub: 'QR verification & fuel dispensing',
-    },
-    SYSTEM_ADMIN: {
-      label: 'System Administrator',
-      initial: 'SA',
-      sub: 'Technical configuration only',
-    },
-  };
-
-  const meta = roleMeta[user.role] || {
-    label: user.fullName,
-    initial: 'US',
-    sub: user.role,
-  };
+  const roleInfo = getRoleTitle(user.role);
 
   // Breadcrumb generation based on route
   const getBreadcrumb = (path: string) => {
@@ -57,40 +30,64 @@ export const Topbar: React.FC = () => {
     if (path.includes('/sysadmin/audit')) return 'System Administration / Technical Audit Logs';
     if (path.includes('/sysadmin/health')) return 'System Administration / System Health';
     if (path.includes('/reports')) return 'Monitoring & Reports / Department Analytics';
-    return `Dashboard / ${meta.label}`;
+    return `Dashboard / ${roleInfo.badge}`;
   };
 
   return (
-    <header className="h-[72px] bg-white border-b border-gov-line flex items-center justify-between px-[30px] sticky top-0 z-30">
-      <div className="text-[13px] text-gov-muted font-medium">
-        {getBreadcrumb(location.pathname)}
-      </div>
-
-      <div className="flex items-center gap-[18px]">
-        {/* User Identity info matching prototype */}
-        <div className="flex items-center gap-3">
-          <div className="h-[36px] w-[36px] rounded-full bg-gov-softBlue text-gov-blue grid place-items-center font-bold text-xs shadow-inner">
-            {meta.initial}
-          </div>
-          <div className="text-left hidden sm:block">
-            <div className="text-[13px] font-bold text-gov-ink leading-tight">
-              {meta.label}
-            </div>
-            <div className="text-[11px] text-gov-muted leading-tight mt-0.5">
-              {meta.sub}
-            </div>
-          </div>
+    <>
+      <header className="h-[72px] bg-white border-b border-gov-line flex items-center justify-between px-[30px] sticky top-0 z-30 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+        <div className="text-[13px] text-gov-muted font-medium flex items-center gap-2">
+          <span>{getBreadcrumb(location.pathname)}</span>
         </div>
 
-        <button
-          onClick={logout}
-          className="border border-gov-line bg-white hover:bg-gray-50 text-gov-ink text-xs font-semibold px-3 py-2 rounded-[8px] transition-colors flex items-center gap-1.5 shadow-sm"
-          title="Sign out of system"
-        >
-          <span>Logout</span>
-          <LogOut size={13} className="text-gov-muted" />
-        </button>
-      </div>
-    </header>
+        <div className="flex items-center gap-3.5">
+          {/* Enhanced User Identity Button / Trigger */}
+          <button
+            type="button"
+            onClick={() => setIsProfileOpen(true)}
+            className="flex items-center gap-3 p-1.5 pr-2.5 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all text-left group cursor-pointer"
+            title="Click to view and edit profile"
+          >
+            <UserAvatar user={user} size="md" showIndicator={true} />
+            <div className="text-left hidden sm:block">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[13px] font-bold text-gov-ink leading-tight group-hover:text-gov-blue transition-colors">
+                  {user.fullName || user.username}
+                </span>
+                <span className="text-[11px] font-mono text-gov-muted font-medium">
+                  @{user.username}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded leading-tight border ${roleInfo.bg}`}>
+                  {roleInfo.badge}
+                </span>
+                <span className="text-[11px] text-gov-muted truncate max-w-[140px]">
+                  {user.fuelStation?.name || user.office?.name || 'Office of Agriculture'}
+                </span>
+              </div>
+            </div>
+            <ChevronDown
+              size={14}
+              className="text-slate-400 group-hover:text-slate-600 transition-transform group-hover:translate-y-0.5 shrink-0"
+            />
+          </button>
+
+          <div className="h-6 w-px bg-slate-200" />
+
+          <button
+            onClick={logout}
+            className="border border-gov-line bg-white hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 text-gov-ink text-xs font-semibold px-3 py-2 rounded-[8px] transition-colors flex items-center gap-1.5 shadow-sm"
+            title="Sign out of system"
+          >
+            <span>Logout</span>
+            <LogOut size={13} className="text-gov-muted" />
+          </button>
+        </div>
+      </header>
+
+      {/* Profile Management Modal */}
+      <ProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
+    </>
   );
 };

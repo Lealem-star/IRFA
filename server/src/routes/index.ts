@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticateJWT, requireRole, requireStationScope, disallowAdminOperational } from '../middleware/auth.js';
-import { uploadFarmerPhoto } from '../middleware/upload.js';
+import { uploadFarmerPhoto, uploadUserAvatar } from '../middleware/upload.js';
 import * as authCtrl from '../controllers/auth.controller.js';
 import * as farmerCtrl from '../controllers/farmer.controller.js';
 import * as allocCtrl from '../controllers/allocation.controller.js';
@@ -18,6 +18,7 @@ const router = Router();
 // ==================== AUTH ROUTES ====================
 router.post('/auth/login', authCtrl.login);
 router.get('/auth/me', authenticateJWT, authCtrl.getMe);
+router.put('/auth/profile', authenticateJWT, uploadUserAvatar.single('avatar'), authCtrl.updateProfile);
 router.post('/auth/logout', authenticateJWT, authCtrl.logout);
 router.post('/auth/change-password', authenticateJWT, authCtrl.changePassword);
 
