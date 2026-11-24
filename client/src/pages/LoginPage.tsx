@@ -39,18 +39,18 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen h-screen w-full relative flex flex-col justify-center items-center py-3 px-4 bg-cover bg-center bg-no-repeat selection:bg-blue-100 selection:text-blue-900 overflow-hidden"
+      className="min-h-screen h-screen w-full relative flex flex-col justify-center items-center py-4 px-4 bg-cover bg-center bg-no-repeat selection:bg-blue-100 selection:text-blue-900 overflow-hidden"
       style={{ backgroundImage: "url('/branding/login-bg.jpg')" }}
     >
       {/* Subtle translucent overlay for perfect contrast while keeping the landscape vivid */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white/35 via-white/20 to-white/45 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-white/15 to-white/40 pointer-events-none" />
 
       {/* Main Centered Column */}
-      <div className="w-full max-w-[400px] my-auto relative z-10 flex flex-col items-center">
+      <div className="w-full max-w-[360px] sm:max-w-[380px] my-auto relative z-10 flex flex-col items-center">
         {/* ================= Institutional Branding Header (Logo & Single-Line Title) ================= */}
-        <div className="text-center mb-2.5 flex flex-col items-center">
-          {/* 1. Real SVG Logo Emblem - Compact */}
-          <div className="w-14 h-14 sm:w-16 sm:h-16 mb-1.5 drop-shadow-[0_4px_12px_rgba(18,49,91,0.2)] transition-transform hover:scale-105 duration-300">
+        <div className="text-center mb-6 flex flex-col items-center">
+          {/* 1. Real SVG Logo Emblem */}
+          <div className="w-16 h-16 sm:w-20 sm:h-20 mb-2.5 drop-shadow-[0_4px_14px_rgba(18,49,91,0.25)] transition-transform hover:scale-105 duration-300">
             <img
               src="/branding/irfa-mark.svg"
               alt="Digital Fuel Coupon System Emblem"
@@ -61,27 +61,19 @@ export const LoginPage: React.FC = () => {
             />
           </div>
 
-          {/* 2. Digital Fuel Coupon System Title - Guaranteed Single Line */}
-          <h1 className="text-xl sm:text-2xl font-black text-[#12315B] tracking-tight leading-tight text-center drop-shadow-xs whitespace-nowrap">
+          {/* 2. Digital Fuel Coupon System Title - Single Line */}
+          <h1 className="text-2xl sm:text-[26px] font-black text-[#12315B] tracking-tight leading-none text-center drop-shadow-xs whitespace-nowrap">
             Digital Fuel Coupon System
           </h1>
         </div>
 
-        {/* ================= Single Compact White Login Card ================= */}
-        <div className="w-full bg-white/95 backdrop-blur-md border border-white/90 rounded-2xl shadow-[0_12px_36px_rgba(16,40,75,0.16)] p-5 sm:p-6">
-          <div className="text-center mb-4">
-            <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#1686D9]/10 text-[#1686D9] mb-1 shadow-xs">
-              <User size={16} className="fill-[#1686D9]" />
-            </div>
-            <h3 className="text-base sm:text-lg font-bold text-gray-900 tracking-tight">Sign In</h3>
-            <p className="text-[11px] text-gray-500 mt-0.5">Access your account to continue</p>
-          </div>
-
+        {/* ================= Transparent Login Form Container ================= */}
+        <div className="w-full px-2">
           {/* Error Alert */}
           {error && (
             <div
               role="alert"
-              className="mb-3.5 p-2.5 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs flex items-start gap-2 shadow-xs"
+              className="mb-3.5 p-2.5 bg-red-50/95 backdrop-blur-xs border border-red-200 rounded-xl text-red-700 text-xs flex items-start gap-2 shadow-sm"
             >
               <AlertCircle size={14} className="text-red-600 shrink-0 mt-0.5" />
               <span className="leading-tight font-medium">{error}</span>
@@ -99,7 +91,7 @@ export const LoginPage: React.FC = () => {
                 Username
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-500">
                   <User size={16} />
                 </div>
                 <input
@@ -112,7 +104,7 @@ export const LoginPage: React.FC = () => {
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Username"
                   disabled={loading}
-                  className="w-full pl-9 pr-3 py-2 bg-[#f8fafc] border border-gray-200 rounded-xl text-xs sm:text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#1686D9] focus:bg-white focus:ring-2 focus:ring-[#1686D9]/15 transition-all shadow-xs"
+                  className="w-full pl-10 pr-3.5 py-2.5 bg-white/90 hover:bg-white focus:bg-white backdrop-blur-sm border border-white/80 focus:border-[#1686D9] rounded-xl text-xs sm:text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1686D9]/20 transition-all shadow-[0_2px_10px_rgba(0,0,0,0.06)]"
                 />
               </div>
             </div>
@@ -126,7 +118,7 @@ export const LoginPage: React.FC = () => {
                 Password
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-500">
                   <Lock size={16} />
                 </div>
                 <input
@@ -138,14 +130,14 @@ export const LoginPage: React.FC = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Password"
                   disabled={loading}
-                  className="w-full pl-9 pr-9 py-2 bg-[#f8fafc] border border-gray-200 rounded-xl text-xs sm:text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#1686D9] focus:bg-white focus:ring-2 focus:ring-[#1686D9]/15 transition-all shadow-xs"
+                  className="w-full pl-10 pr-10 py-2.5 bg-white/90 hover:bg-white focus:bg-white backdrop-blur-sm border border-white/80 focus:border-[#1686D9] rounded-xl text-xs sm:text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1686D9]/20 transition-all shadow-[0_2px_10px_rgba(0,0,0,0.06)]"
                 />
                 <button
                   type="button"
                   tabIndex={-1}
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-500 hover:text-gray-800 transition-colors"
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -156,7 +148,7 @@ export const LoginPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-1 py-2.5 px-4 bg-[#1686D9] hover:bg-[#1173bd] active:bg-[#0d5ca8] text-white rounded-xl text-xs sm:text-sm font-bold transition-all shadow-[0_4px_14px_rgba(22,134,217,0.3)] hover:shadow-[0_6px_18px_rgba(22,134,217,0.4)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full mt-2 py-2.5 px-4 bg-[#1686D9] hover:bg-[#1173bd] active:bg-[#0d5ca8] text-white rounded-xl text-xs sm:text-sm font-bold transition-all shadow-[0_4px_16px_rgba(22,134,217,0.35)] hover:shadow-[0_6px_20px_rgba(22,134,217,0.45)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
             >
               {loading ? (
                 <>
@@ -171,27 +163,18 @@ export const LoginPage: React.FC = () => {
               )}
             </button>
           </form>
-
-          {/* Secure Access Indicator */}
-          <div className="mt-3.5 pt-2.5 border-t border-gray-100 flex flex-col items-center justify-center gap-0.5">
-            <span className="text-[9px] font-semibold text-gray-400 uppercase tracking-widest">
-              Secure Access
-            </span>
-            <div className="w-5 h-5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 grid place-items-center shadow-xs">
-              <ShieldCheck size={12} />
-            </div>
-          </div>
         </div>
-
-        {/* ================= Compact Footer Credits ================= */}
-        <footer className="w-full text-center mt-3 select-text">
-          <div className="inline-flex items-center justify-center gap-1.5 text-[10px] text-gray-700 bg-white/75 backdrop-blur-xs px-3 py-1 rounded-lg shadow-xs border border-white/50">
-            <span className="font-medium">Powered by Bahir Dar City Administration Office of Agriculture</span>
-            <span className="text-gray-400">·</span>
-            <span className="font-semibold text-gray-800">Developed by Enqopa Technologies PLC</span>
-          </div>
-        </footer>
       </div>
+
+      {/* ================= Bottom End Credits (Left & Right Ends) ================= */}
+      <footer className="absolute bottom-0 inset-x-0 w-full px-5 sm:px-8 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-1 text-[11px] font-medium text-gray-800 bg-white/40 backdrop-blur-xs select-text border-t border-white/30 z-20">
+        <div className="drop-shadow-2xs">
+          Powered by Bahir Dar City Administration Office of Agriculture
+        </div>
+        <div className="drop-shadow-2xs font-semibold text-gray-900">
+          Developed by Enqopa Technologies PLC
+        </div>
+      </footer>
     </div>
   );
 };
