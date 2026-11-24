@@ -1,0 +1,176 @@
+{
+  "results": [
+    {
+      "suite": "TEST 1 — APPLICATION & AUTHENTICATION",
+      "testCase": "Minimal institutional login layout & Bahir Dar Agriculture Directorate branding",
+      "role": "Public / Unauthenticated",
+      "expected": "Title \"IRFA | Bahir Dar Agriculture Directorate\" with Amharic and English institutional branding",
+      "actual": "Title: \"IRFA | Bahir Dar Agriculture Directorate\", Directorate branding: true, Logo: true",
+      "status": "PASS"
+    },
+    {
+      "suite": "TEST 1 — APPLICATION & AUTHENTICATION",
+      "testCase": "Direct centered login card on landing page",
+      "role": "Public / Unauthenticated",
+      "expected": "Username, password and sign-in button directly accessible on landing view",
+      "actual": "Login form directly present: true",
+      "status": "PASS"
+    },
+    {
+      "suite": "TEST 1 — APPLICATION & AUTHENTICATION",
+      "testCase": "Incorrect password validation",
+      "role": "Public / Unauthenticated",
+      "expected": "Displays error alert: \"Invalid username or password\"",
+      "actual": "Alert text: \"Invalid username or password.\"",
+      "status": "PASS"
+    },
+    {
+      "suite": "TEST 1 — APPLICATION & AUTHENTICATION",
+      "testCase": "Agriculture Office login and role redirect",
+      "role": "AGRICULTURE_OFFICE",
+      "expected": "Redirects to /dashboard with Agriculture Office badge",
+      "actual": "Redirected to /dashboard: true, Badge verified: true",
+      "status": "PASS"
+    },
+    {
+      "suite": "TEST 1 — APPLICATION & AUTHENTICATION",
+      "testCase": "User logout and session clearance",
+      "role": "AGRICULTURE_OFFICE",
+      "expected": "Session terminated, redirected back to /login",
+      "actual": "Current URL: http://localhost:5173/login",
+      "status": "PASS"
+    },
+    {
+      "suite": "TEST 1 — APPLICATION & AUTHENTICATION",
+      "testCase": "Protected route guard without active session",
+      "role": "Unauthenticated",
+      "expected": "Immediate redirection to /login",
+      "actual": "Current URL: http://localhost:5173/login",
+      "status": "PASS"
+    },
+    {
+      "suite": "TEST 2 — AGRICULTURE OFFICE",
+      "testCase": "Farmer registration with irrigation profile & card issuance",
+      "role": "AGRICULTURE_OFFICE",
+      "expected": "Farmer saved in database with auto-generated ID and QR card",
+      "actual": "Farmer \"Beshah Molla 2994\" appears in registry: true",
+      "status": "PASS"
+    },
+    {
+      "suite": "TEST 2 — AGRICULTURE OFFICE",
+      "testCase": "Real-time farmer search by name / ID",
+      "role": "AGRICULTURE_OFFICE",
+      "expected": "Table filters dynamically to show searched farmer",
+      "actual": "Filtered list contains \"Beshah Molla 2994\": true",
+      "status": "PASS"
+    },
+    {
+      "suite": "TEST 2 — AGRICULTURE OFFICE",
+      "testCase": "Farmer dossier page and printable QR digital ID card",
+      "role": "AGRICULTURE_OFFICE",
+      "expected": "Displays irrigation metrics and printable digital QR identity card",
+      "actual": "Irrigation profile present: true, QR Code image rendered: true",
+      "status": "PASS"
+    },
+    {
+      "suite": "TEST 2 — AGRICULTURE OFFICE",
+      "testCase": "Monthly fuel allocation quota creation",
+      "role": "AGRICULTURE_OFFICE",
+      "expected": "Allocation recorded with allocatedLiters = remainingLiters (175 L)",
+      "actual": "Table contains allocation: true",
+      "status": "PASS"
+    },
+    {
+      "suite": "TEST 2 — AGRICULTURE OFFICE",
+      "testCase": "Prepare and submit bundled fuel request to Trade Office",
+      "role": "AGRICULTURE_OFFICE",
+      "expected": "Request submitted with TR-YYYY-XXX reference and status \"Submitted\"",
+      "actual": "Submitted request appears in table: true",
+      "status": "PASS"
+    },
+    {
+      "suite": "TEST 3 — TRADE OFFICE",
+      "testCase": "Incoming requests queue presentation",
+      "role": "TRADE_OFFICE",
+      "expected": "Trade queue lists requests submitted by Agriculture Office",
+      "actual": "Incoming request review buttons available: true",
+      "status": "PASS"
+    },
+    {
+      "suite": "TEST 3 — TRADE OFFICE",
+      "testCase": "Request approval and formal authorization generation",
+      "role": "TRADE_OFFICE",
+      "expected": "Request status updates to Approved; provisions FuelAuthorization records",
+      "actual": "Approved status verified: true",
+      "status": "PASS"
+    },
+    {
+      "suite": "TEST 3 — TRADE OFFICE",
+      "testCase": "Assign authorized farmer quota to local fuel station",
+      "role": "TRADE_OFFICE",
+      "expected": "Station assignment mapped and status shows \"Assigned\"",
+      "actual": "Assignment confirmed: true",
+      "status": "PASS"
+    },
+    {
+      "suite": "TEST 4 — FUEL STATION OPERATIONS",
+      "testCase": "8-step live legality QR verification for authorized farmer",
+      "role": "STATION_ADMIN",
+      "expected": "Returns green AUTHORIZED banner with quota balance breakdown",
+      "actual": "Authorized banner: true, Remaining quota card: true",
+      "status": "PASS"
+    },
+    {
+      "suite": "TEST 4 — FUEL STATION OPERATIONS",
+      "testCase": "Atomic fuel dispensing and official receipt issuance",
+      "role": "STATION_ADMIN",
+      "expected": "Generates official receipt TX-YYYYMMDD-XXXX with printable layout",
+      "actual": "Receipt modal displayed: true",
+      "status": "PASS"
+    },
+    {
+      "suite": "TEST 4 — FUEL STATION OPERATIONS",
+      "testCase": "Suspended / Inactive farmer scan rejection",
+      "role": "STATION_ADMIN",
+      "expected": "Access blocked with red REJECTED banner citing suspension reason",
+      "actual": "Rejected alert rendered: true",
+      "status": "PASS"
+    },
+    {
+      "suite": "TEST 4 — FUEL STATION OPERATIONS",
+      "testCase": "Station transaction history audit log",
+      "role": "STATION_ADMIN",
+      "expected": "Completed dispensing appears in immutable transaction table",
+      "actual": "Transaction record visible: true",
+      "status": "PASS"
+    },
+    {
+      "suite": "TEST 5 — SYSTEM ADMINISTRATOR",
+      "testCase": "System health diagnostics & database ping",
+      "role": "SYSTEM_ADMIN",
+      "expected": "Displays operational application status and MySQL connectivity",
+      "actual": "Health indicators operational: true",
+      "status": "PASS"
+    },
+    {
+      "suite": "TEST 5 — SYSTEM ADMINISTRATOR",
+      "testCase": "User accounts and role access directory",
+      "role": "SYSTEM_ADMIN",
+      "expected": "Lists system users with roles, offices, and status",
+      "actual": "User table loaded: true",
+      "status": "PASS"
+    },
+    {
+      "suite": "TEST 5 — SYSTEM ADMINISTRATOR",
+      "testCase": "Technical audit trail log inspection",
+      "role": "SYSTEM_ADMIN",
+      "expected": "Displays immutable log of system actions and timestamps",
+      "actual": "Audit logs loaded: true",
+      "status": "PASS"
+    }
+  ],
+  "consoleErrors": [
+    "[Console Error] Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+    "[Console Error] Failed to load resource: the server responded with a status of 403 (Forbidden)"
+  ]
+}

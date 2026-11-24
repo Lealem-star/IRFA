@@ -1,0 +1,441 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  AGRICULTURE_OFFICE
+  TRADE_OFFICE
+  STATION_ADMIN
+  SYSTEM_ADMIN
+}
+
+enum EligibilityStatus {
+  ELIGIBLE
+  UNDER_REVIEW
+  SUSPENDED
+  INELIGIBLE
+}
+
+enum WaterSource {
+  LAKE_TANA
+  BLUE_NILE
+  BOREHOLE
+  RIVER_DIVERSION
+  OTHER
+}
+
+enum CardStatus {
+  ACTIVE
+  PENDING
+  LOST
+  DEACTIVATED
+}
+
+enum AllocationStatus {
+  PLANNED
+  SUBMITTED
+  ACTIVE
+  EXHAUSTED
+  CANCELLED
+}
+
+enum RequestStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  PARTIALLY_APPROVED
+  REJECTED
+  RETURNED
+}
+
+enum ItemStatus {
+  PENDING
+  APPROVED
+  PARTIALLY_APPROVED
+  REJECTED
+}
+
+enum AuthStatus {
+  ACTIVE
+  EXHAUSTED
+  EXPIRED
+  REVOKED
+}
+
+enum AssignmentStatus {
+  ACTIVE
+  TRANSFERRED
+  REVOKED
+}
+
+enum TransactionStatus {
+  COMPLETED
+  VOIDED
+}
+
+enum VerificationResult {
+  SUCCESS
+  REJECTED
+}
+
+model Office {
+  id           String    @id @default(uuid())
+  code         String    @unique
+  name         String
+  nameAmharic  String?
+  type         String
+  users        User[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("offices")
+}
+
+model FuelStation {
+  id                String             @id @default(uuid())
+  code              String             @unique
+  name              String
+  location          String
+  contactPerson     String?
+  phone             String?
+  licenseNumber     String?
+  isActive          Boolean            @default(true)
+  users             User[]
+  assignments       StationAssignment[]
+  transactions      FuelTransaction[]
+  verificationLogs  VerificationLog[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  @@map("fuel_stations")
+}
+
+model User {
+  id                 String             @id @default(uuid())
+  username           String             @unique
+  email              String?            @unique
+  passwordHash       String
+  fullName           String
+  role               UserRole
+  officeId           String?
+  office             Office?            @relation(fields: [officeId], references: [id])
+  fuelStationId      String?
+  fuelStation        FuelStation?       @relation(fields: [fuelStationId], references: [id])
+  isActive           Boolean            @default(true)
+  lastLoginAt        DateTime?
+  submittedRequests  FuelRequest[]      @relation("SubmittedBy")
+  reviewedRequests   FuelRequest[]      @relation("ReviewedBy")
+  fuelTransactions   FuelTransaction[]
+  assignedStations   StationAssignment[]
+  verificationLogs   VerificationLog[]
+  auditLogs          AuditLog[]
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  @@index([role])
+  @@map("users")
+}
+
+model Location {
+  id         String    @id @default(uuid())
+  name       String    @unique
+  subCity    String
+  kebeles    Kebele[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@map("locations")
+}
+
+model Kebele {
+  id         String    @id @default(uuid())
+  name       String
+  code       String    @unique
+  locationId String
+  location   Location  @relation(fields: [locationId], references: [id])
+  farmers    Farmer[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@map("kebeles")
+}
+
+model FuelType {
+  id                   String             @id @default(uuid())
+  name                 String             @unique
+  nameAmharic          String?
+  code                 String             @unique
+  unit                 String             @default("Liters")
+  currentPricePerLiter Decimal            @db.Decimal(10, 2)
+  isActive             Boolean            @default(true)
+  monthlyAllocations   MonthlyAllocation[]
+  requestItems         FuelRequestItem[]
+  authorizations       FuelAuthorization[]
+  transactions         FuelTransaction[]
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  @@map("fuel_types")
+}
+
+model Farmer {
+  id                String                   @id @default(uuid())
+  farmerCode        String                   @unique
+  fullName          String
+  phone             String
+  nationalId        String?                  @unique
+  photoUrl          String?
+  kebeleId          String
+  kebele            Kebele                   @relation(fields: [kebeleId], references: [id])
+  eligibilityStatus EligibilityStatus        @default(ELIGIBLE)
+  isActive          Boolean                  @default(true)
+  suspensionReason  String?
+  irrigationProfile FarmerIrrigationProfile?
+  cards             FarmerCard[]
+  allocations       MonthlyAllocation[]
+  requestItems      FuelRequestItem[]
+  authorizations    FuelAuthorization[]
+  transactions      FuelTransaction[]
+  verificationLogs  VerificationLog[]
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
+
+  @@index([farmerCode])
+  @@index([eligibilityStatus])
+  @@map("farmers")
+}
+
+model FarmerIrrigationProfile {
+  id                String       @id @default(uuid())
+  farmerId          String       @unique
+  farmer            Farmer       @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+  landSizeHectares  Decimal      @db.Decimal(8, 2)
+  waterSource       WaterSource  @default(LAKE_TANA)
+  waterSourceDetail String?
+  pumpFuelType      String
+  pumpHorsepower    String?
+  pumpModel         String?
+  primaryCrops      String?
+  irrigationSeason  String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@map("farmer_irrigation_profiles")
+}
+
+model FarmerCard {
+  id                 String     @id @default(uuid())
+  farmerId           String
+  farmer             Farmer     @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+  cardSerialNumber   String     @unique
+  qrToken            String     @unique
+  status             CardStatus @default(ACTIVE)
+  issuedAt           DateTime   @default(now())
+  expiresAt          DateTime?
+  deactivatedAt      DateTime?
+  deactivationReason String?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  @@index([qrToken])
+  @@map("farmer_cards")
+}
+
+model MonthlyAllocation {
+  id              String           @id @default(uuid())
+  farmerId        String
+  farmer          Farmer           @relation(fields: [farmerId], references: [id])
+  fuelTypeId      String
+  fuelType        FuelType         @relation(fields: [fuelTypeId], references: [id])
+  month           Int
+  year            Int
+  allocatedLiters Decimal          @db.Decimal(10, 2)
+  usedLiters      Decimal          @default(0.00) @db.Decimal(10, 2)
+  remainingLiters Decimal          @db.Decimal(10, 2)
+  status          AllocationStatus @default(ACTIVE)
+  notes           String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@unique([farmerId, fuelTypeId, month, year])
+  @@index([month, year])
+  @@map("monthly_allocations")
+}
+
+model FuelRequest {
+  id                  String             @id @default(uuid())
+  requestNumber       String             @unique
+  periodMonth         Int
+  periodYear          Int
+  title               String
+  totalFarmersCount   Int                @default(0)
+  totalLitersRequested Decimal           @default(0.00) @db.Decimal(12, 2)
+  totalLitersApproved  Decimal           @default(0.00) @db.Decimal(12, 2)
+  status              RequestStatus      @default(SUBMITTED)
+  submittedById       String
+  submittedBy         User               @relation("SubmittedBy", fields: [submittedById], references: [id])
+  submittedAt         DateTime           @default(now())
+  reviewedById        String?
+  reviewedBy          User?              @relation("ReviewedBy", fields: [reviewedById], references: [id])
+  reviewedAt          DateTime?
+  reviewRemarks       String?            @db.Text
+  items               FuelRequestItem[]
+  authorizations      FuelAuthorization[]
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  @@index([status])
+  @@index([periodMonth, periodYear])
+  @@map("fuel_requests")
+}
+
+model FuelRequestItem {
+  id              String             @id @default(uuid())
+  fuelRequestId   String
+  fuelRequest     FuelRequest        @relation(fields: [fuelRequestId], references: [id], onDelete: Cascade)
+  farmerId        String
+  farmer          Farmer             @relation(fields: [farmerId], references: [id])
+  fuelTypeId      String
+  fuelType        FuelType           @relation(fields: [fuelTypeId], references: [id])
+  requestedLiters Decimal            @db.Decimal(10, 2)
+  approvedLiters  Decimal            @default(0.00) @db.Decimal(10, 2)
+  itemStatus      ItemStatus         @default(PENDING)
+  remarks         String?
+  authorization   FuelAuthorization?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  @@unique([fuelRequestId, farmerId, fuelTypeId])
+  @@map("fuel_request_items")
+}
+
+model FuelAuthorization {
+  id                String              @id @default(uuid())
+  authCode          String              @unique
+  fuelRequestId     String
+  fuelRequest       FuelRequest         @relation(fields: [fuelRequestId], references: [id])
+  fuelRequestItemId String              @unique
+  fuelRequestItem   FuelRequestItem     @relation(fields: [fuelRequestItemId], references: [id])
+  farmerId          String
+  farmer            Farmer              @relation(fields: [farmerId], references: [id])
+  fuelTypeId        String
+  fuelType          FuelType            @relation(fields: [fuelTypeId], references: [id])
+  authorizedLiters  Decimal             @db.Decimal(10, 2)
+  consumedLiters    Decimal             @default(0.00) @db.Decimal(10, 2)
+  remainingLiters   Decimal             @db.Decimal(10, 2)
+  validFrom         DateTime
+  validTo           DateTime
+  status            AuthStatus          @default(ACTIVE)
+  remarks           String?
+  assignments       StationAssignment[]
+  transactions      FuelTransaction[]
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  @@index([authCode])
+  @@index([farmerId])
+  @@index([status])
+  @@map("fuel_authorizations")
+}
+
+model StationAssignment {
+  id                  String            @id @default(uuid())
+  fuelAuthorizationId String
+  fuelAuthorization   FuelAuthorization @relation(fields: [fuelAuthorizationId], references: [id], onDelete: Cascade)
+  fuelStationId       String
+  fuelStation         FuelStation       @relation(fields: [fuelStationId], references: [id])
+  assignedById        String
+  assignedBy          User              @relation(fields: [assignedById], references: [id])
+  assignedAt          DateTime          @default(now())
+  status              AssignmentStatus  @default(ACTIVE)
+  notes               String?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  @@unique([fuelAuthorizationId, fuelStationId])
+  @@index([fuelStationId])
+  @@map("station_assignments")
+}
+
+model FuelTransaction {
+  id                  String            @id @default(uuid())
+  receiptNumber       String            @unique
+  fuelStationId       String
+  fuelStation         FuelStation       @relation(fields: [fuelStationId], references: [id])
+  operatorId          String
+  operator            User              @relation(fields: [operatorId], references: [id])
+  farmerId            String
+  farmer              Farmer            @relation(fields: [farmerId], references: [id])
+  fuelAuthorizationId String
+  fuelAuthorization   FuelAuthorization @relation(fields: [fuelAuthorizationId], references: [id])
+  fuelTypeId          String
+  fuelType            FuelType          @relation(fields: [fuelTypeId], references: [id])
+  quantityLiters      Decimal           @db.Decimal(10, 2)
+  pricePerLiter       Decimal           @db.Decimal(10, 2)
+  totalAmount         Decimal           @db.Decimal(10, 2)
+  transactionDate     DateTime          @default(now())
+  status              TransactionStatus @default(COMPLETED)
+  notes               String?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  @@index([receiptNumber])
+  @@index([fuelStationId])
+  @@index([farmerId])
+  @@map("fuel_transactions")
+}
+
+model VerificationLog {
+  id              String             @id @default(uuid())
+  fuelStationId   String
+  fuelStation     FuelStation        @relation(fields: [fuelStationId], references: [id])
+  operatorId      String
+  operator        User               @relation(fields: [operatorId], references: [id])
+  farmerId        String?
+  farmer          Farmer?            @relation(fields: [farmerId], references: [id])
+  scannedToken    String
+  result          VerificationResult
+  rejectionReason String?
+  ipAddress       String?
+  createdAt       DateTime           @default(now())
+
+  @@index([fuelStationId])
+  @@index([createdAt])
+  @@map("verification_logs")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  action     String
+  entityType String
+  entityId   String?
+  details    String?  @db.Text
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([entityType])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model SystemSetting {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String   @db.Text
+  category    String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("system_settings")
+}

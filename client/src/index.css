@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gov-bg text-gov-ink antialiased font-sans;
+    margin: 0;
+  }
+}
+
+/* Custom scrollbars and table styles matching prototype */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f4f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* =========================================================================
+   DEDICATED PRINT STYLES FOR OFFICIAL WALLET-SIZE FARMER DIGITAL ID
+   Standard CR80 / ID-1 Dimensions: 85.60 mm x 53.98 mm
+   ========================================================================= */
+@page {
+  size: A4 portrait;
+  margin: 8mm;
+}
+
+@media print {
+  html, body {
+    background: #ffffff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  /* Single Card Print Target (Also keeps #printable-card for backwards test compatibility) */
+  #printable-card,
+  #printable-card *,
+  #printable-single-card,
+  #printable-single-card *,
+  #printable-batch-sheet,
+  #printable-batch-sheet *,
+  #printable-receipt,
+  #printable-receipt * {
+    visibility: visible;
+  }
+
+  #printable-card,
+  #printable-single-card {
+    position: absolute;
+    left: 10mm;
+    top: 10mm;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  #printable-batch-sheet {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 6mm !important;
+    background: transparent !important;
+  }
+
+  /* Physical card boundary lockdown */
+  .farmer-id-card {
+    width: 85.6mm !important;
+    height: 53.98mm !important;
+    min-width: 85.6mm !important;
+    min-height: 53.98mm !important;
+    max-width: 85.6mm !important;
+    max-height: 53.98mm !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .batch-card-cell {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+}

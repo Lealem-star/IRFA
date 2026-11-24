@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Gear cog background -->
+  <circle cx="32" cy="32" r="30" fill="#12315B" />
+  <!-- Inner circular sky -->
+  <circle cx="32" cy="32" r="23" fill="#EAF4FC" />
+  <!-- Sun -->
+  <circle cx="37" cy="20" r="5" fill="#F4BA38" />
+  <!-- Field hills -->
+  <path d="M 12,41 Q 25,29 45,33 L 47,48 L 10,48 Z" fill="#2F8B45" />
+  <path d="M 14,44 Q 27,33 46,36 L 47,48 L 12,48 Z" fill="#72BE44" />
+  <!-- Water Droplet -->
+  <path d="M 32,15 C 32,15 25,23 25,29 C 25,33 28,36 32,36 C 36,36 39,33 39,29 C 39,23 32,15 32,15 Z" fill="#1686D9" stroke="#FFFFFF" stroke-width="1.2" />
+  <!-- Droplet shine -->
+  <path d="M 28,27 C 28,24 30,21 31,19 C 30,22 29,25 29,27 Z" fill="#FFFFFF" opacity="0.8" />
+  <!-- Water Waves Base -->
+  <path d="M 10,46 C 18,41 24,49 32,45 C 38,42 43,46 48,43 L 48,52 L 10,52 Z" fill="#1686D9" />
+  <!-- White highlight line -->
+  <path d="M 12,47 C 18,43 24,49 32,46 C 38,43 43,47 48,44" stroke="#FFFFFF" stroke-width="0.8" fill="none" opacity="0.7" />
+  <!-- Border -->
+  <circle cx="32" cy="32" r="23" stroke="#12315B" stroke-width="1.5" fill="none" />
+</svg>

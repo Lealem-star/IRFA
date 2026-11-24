@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none">
+  <!-- Circular Base / Shadow -->
+  <defs>
+    <linearGradient id="skyGrad" x1="200" y1="50" x2="200" y2="280" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#EAF4FC" />
+      <stop offset="100%" stop-color="#FFFFFF" />
+    </linearGradient>
+    <linearGradient id="gearGrad" x1="60" y1="60" x2="340" y2="340" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#12315B" />
+      <stop offset="100%" stop-color="#0A1D36" />
+    </linearGradient>
+    <linearGradient id="dropGrad" x1="170" y1="90" x2="230" y2="220" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2CA5F5" />
+      <stop offset="100%" stop-color="#106CB8" />
+    </linearGradient>
+    <linearGradient id="waveGrad" x1="100" y1="280" x2="300" y2="360" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1C8DE8" />
+      <stop offset="100%" stop-color="#0C5298" />
+    </linearGradient>
+    <linearGradient id="fieldGrad1" x1="100" y1="200" x2="300" y2="300" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#349E48" />
+      <stop offset="100%" stop-color="#237433" />
+    </linearGradient>
+    <linearGradient id="fieldGrad2" x1="100" y1="220" x2="300" y2="300" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#72BE44" />
+      <stop offset="100%" stop-color="#4B9B32" />
+    </linearGradient>
+    <clipPath id="circleClip">
+      <circle cx="200" cy="200" r="148" />
+    </clipPath>
+  </defs>
+
+  <!-- Outer Mechanical Cog / Gear (Resource Management) -->
+  <path d="M 182,24 L 218,24 L 221,49 A 150,150 0 0,1 254,63 L 274,45 L 301,67 L 287,90 A 150,150 0 0,1 310,119 L 335,113 L 348,147 L 326,164 A 150,150 0 0,1 332,198 L 356,207 L 352,243 L 327,249 A 150,150 0 0,1 313,281 L 333,299 L 312,327 L 288,315 A 150,150 0 0,1 259,336 L 261,361 L 226,370 L 217,346 A 150,150 0 0,1 183,346 L 174,370 L 139,361 L 141,336 A 150,150 0 0,1 112,315 L 88,327 L 67,299 L 87,281 A 150,150 0 0,1 73,249 L 48,243 L 44,207 L 68,198 A 150,150 0 0,1 74,164 L 52,147 L 65,113 L 90,119 A 150,150 0 0,1 113,90 L 99,67 L 126,45 L 146,63 A 150,150 0 0,1 179,49 Z" fill="url(#gearGrad)" />
+
+  <!-- Inner Circle Framework -->
+  <circle cx="200" cy="200" r="148" fill="url(#skyGrad)" stroke="#FFFFFF" stroke-width="8" />
+
+  <!-- Content Clapped in Circle -->
+  <g clip-path="url(#circleClip)">
+    <!-- Golden Sun with Radiating Rays -->
+    <circle cx="230" cy="125" r="32" fill="#F4BA38" />
+    <!-- Sun Rays -->
+    <path d="M 230,82 L 230,72 M 255,91 L 263,84 M 271,114 L 281,112 M 272,139 L 281,144 M 257,160 L 265,167 M 205,92 L 197,85" stroke="#F4BA38" stroke-width="4.5" stroke-linecap="round" />
+
+    <!-- Mountain Silhouette in Background -->
+    <path d="M 180,185 Q 215,135 250,145 T 320,180 L 350,220 L 160,220 Z" fill="#4B9ED8" opacity="0.6" />
+    <path d="M 215,160 Q 255,130 285,148 T 350,190 L 350,240 L 200,240 Z" fill="#2E7EBA" opacity="0.4" />
+
+    <!-- Agricultural Terraces / Irrigated Furrows -->
+    <path d="M 70,260 Q 180,170 340,200 L 350,350 L 50,350 Z" fill="url(#fieldGrad1)" />
+    <path d="M 85,280 Q 190,195 340,215 L 350,350 L 60,350 Z" fill="url(#fieldGrad2)" />
+    <path d="M 100,300 Q 200,225 340,235 L 350,350 L 70,350 Z" fill="url(#fieldGrad1)" />
+    
+    <!-- White Furrow Lines showing cultivated irrigation rows -->
+    <path d="M 115,268 Q 205,200 325,212" stroke="#FFFFFF" stroke-width="3.5" fill="none" opacity="0.75" />
+    <path d="M 130,286 Q 215,220 330,228" stroke="#FFFFFF" stroke-width="3" fill="none" opacity="0.75" />
+    <path d="M 150,304 Q 230,242 335,248" stroke="#FFFFFF" stroke-width="3" fill="none" opacity="0.7" />
+
+    <!-- Irrigation Sprinkler Equipment -->
+    <g transform="translate(250, 155)">
+      <!-- Riser pipe -->
+      <line x1="0" y1="40" x2="0" y2="10" stroke="#12315B" stroke-width="5" stroke-linecap="round" />
+      <circle cx="0" cy="8" r="4.5" fill="#12315B" />
+      <!-- Sprayed water jets -->
+      <path d="M -4,6 Q -14,-4 -24,-2" stroke="#1686D9" stroke-width="3" fill="none" stroke-linecap="round" />
+      <path d="M -2,4 Q -8,-12 -16,-16" stroke="#1686D9" stroke-width="3" fill="none" stroke-linecap="round" />
+      <path d="M 2,4 Q 8,-12 16,-16" stroke="#1686D9" stroke-width="3" fill="none" stroke-linecap="round" />
+      <path d="M 4,6 Q 14,-4 24,-2" stroke="#1686D9" stroke-width="3" fill="none" stroke-linecap="round" />
+      <!-- Water Droplets -->
+      <circle cx="-28" cy="-1" r="2.5" fill="#1686D9" />
+      <circle cx="-19" cy="-19" r="2.5" fill="#1686D9" />
+      <circle cx="19" cy="-19" r="2.5" fill="#1686D9" />
+      <circle cx="28" cy="-1" r="2.5" fill="#1686D9" />
+    </g>
+
+    <!-- Central Giant Water Droplet (Primary Irrigation Symbol) -->
+    <path d="M 200,90 C 200,90 148,155 148,196 C 148,225 171,248 200,248 C 229,248 252,225 252,196 C 252,155 200,90 200,90 Z" fill="url(#dropGrad)" stroke="#FFFFFF" stroke-width="5" />
+    <!-- Droplet Glint / Reflection -->
+    <path d="M 168,180 C 168,162 184,136 193,122 C 191,142 178,166 178,184 C 178,194 182,201 180,203 C 174,203 168,192 168,180 Z" fill="#FFFFFF" opacity="0.75" />
+
+    <!-- Flowing Water Wave Base (Blue Nile / Lake Tana) -->
+    <path d="M 50,310 C 110,270 170,335 230,305 C 270,285 310,310 350,290 L 350,360 L 50,360 Z" fill="#1686D9" opacity="0.9" />
+    <path d="M 50,325 C 130,295 180,350 250,320 C 290,300 320,330 350,315 L 350,360 L 50,360 Z" fill="url(#waveGrad)" />
+    <!-- White Water Highlights -->
+    <path d="M 60,318 C 110,292 165,338 225,312 C 265,296 305,318 340,302" stroke="#FFFFFF" stroke-width="3" fill="none" opacity="0.65" />
+    <path d="M 80,335 C 140,312 185,348 245,328 C 285,314 315,332 345,322" stroke="#FFFFFF" stroke-width="2.5" fill="none" opacity="0.5" />
+
+    <!-- Sprouting Green Crop Leaves on Left Flank -->
+    <g transform="translate(100, 175) rotate(-18)">
+      <!-- Large Leaf -->
+      <path d="M 0,60 C -35,30 -40,-15 25,-40 C 40,15 25,50 0,60 Z" fill="#2E8F43" stroke="#FFFFFF" stroke-width="3.5" />
+      <path d="M 0,60 Q 5,10 25,-40" stroke="#FFFFFF" stroke-width="2.5" fill="none" opacity="0.7" />
+      <!-- Second Leaf -->
+      <path d="M -8,45 C -45,35 -55,0 -15,-20 C -2,10 -2,35 -8,45 Z" fill="#6CBF3E" stroke="#FFFFFF" stroke-width="3" />
+    </g>
+  </g>
+
+  <!-- Clean Inner Ring Accent -->
+  <circle cx="200" cy="200" r="148" stroke="#12315B" stroke-width="4.5" fill="none" />
+</svg>
