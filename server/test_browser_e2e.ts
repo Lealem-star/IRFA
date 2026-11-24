@@ -95,15 +95,15 @@ async function runBrowserAcceptanceTests() {
     const landingTitle = await page.title();
     const hasAmharicName = await page.evaluate(() => document.body.innerText.includes('የባሕር ዳር ከተማ አስተዳደር ግብርና መምሪያ'));
     const hasEnglishName = await page.evaluate(() => document.body.innerText.includes('Bahir Dar City Administration Office of Agriculture'));
-    const hasIrfaLogo = await page.evaluate(() => !!document.querySelector('img[alt*="IRFA"]'));
+    const hasIrfaLogo = await page.evaluate(() => !!document.querySelector('img[alt*="Digital Fuel Coupon System"], img[alt*="Emblem"], img[src*="irfa-mark"]'));
 
     results.push({
       suite: 'TEST 1 — APPLICATION & AUTHENTICATION',
-      testCase: 'Minimal institutional login layout & Bahir Dar City Administration Office of Agriculture branding',
+      testCase: 'Minimal institutional login layout & Digital Fuel Coupon System branding',
       role: 'Public / Unauthenticated',
-      expected: 'Title "IRFA | Bahir Dar City Administration Office of Agriculture" with Amharic and English institutional branding',
+      expected: 'Title "Digital Fuel Coupon System | Bahir Dar City Administration Office of Agriculture" with Amharic and English institutional branding',
       actual: `Title: "${landingTitle}", Office branding: ${hasAmharicName && hasEnglishName}, Logo: ${hasIrfaLogo}`,
-      status: landingTitle.includes('Bahir Dar City Administration Office of Agriculture') && hasAmharicName && hasEnglishName && hasIrfaLogo ? 'PASS' : 'FAIL',
+      status: landingTitle.includes('Digital Fuel Coupon System') && hasAmharicName && hasEnglishName && hasIrfaLogo ? 'PASS' : 'FAIL',
     });
 
     // 1.2 Direct Centered Login Form Presentation

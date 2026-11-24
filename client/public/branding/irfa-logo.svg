@@ -11,18 +11,18 @@
   </g>
   <circle cx="250" cy="150" r="129.5" stroke="#12315B" stroke-width="1.5" stroke-opacity="0.25" fill="none" />
 
-  <!-- IRFA Bold Title -->
-  <text x="250" y="370" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="76" font-weight="900" fill="#12315B" text-anchor="middle" letter-spacing="4">IRFA</text>
+  <!-- Digital Fuel Coupon System Title -->
+  <text x="250" y="360" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="28" font-weight="900" fill="#12315B" text-anchor="middle" letter-spacing="1">Digital Fuel Coupon System</text>
 
   <!-- Amharic Subtitle -->
-  <text x="250" y="418" font-family="'Noto Sans Ethiopic', 'Abyssinica SIL', Arial, sans-serif" font-size="22" font-weight="700" fill="#12315B" text-anchor="middle" letter-spacing="0.5">የባሕር ዳር ከተማ አስተዳደር ግብርና መምሪያ</text>
+  <text x="250" y="405" font-family="'Noto Sans Ethiopic', 'Abyssinica SIL', Arial, sans-serif" font-size="20" font-weight="700" fill="#12315B" text-anchor="middle" letter-spacing="0.5">የባሕር ዳር ከተማ አስተዳደር ግብርና መምሪያ</text>
 
   <!-- English Subtitle -->
-  <text x="250" y="450" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="15" font-weight="700" fill="#2A5288" text-anchor="middle" letter-spacing="0.3">Bahir Dar City Administration Office of Agriculture</text>
+  <text x="250" y="435" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="14" font-weight="700" fill="#2A5288" text-anchor="middle" letter-spacing="0.3">Bahir Dar City Administration Office of Agriculture</text>
 
   <!-- Accent Line -->
-  <line x1="150" y1="475" x2="350" y2="475" stroke="#2C9E59" stroke-width="2" stroke-linecap="round" />
+  <line x1="150" y1="460" x2="350" y2="460" stroke="#2C9E59" stroke-width="2" stroke-linecap="round" />
 
   <!-- System Sub-caption -->
-  <text x="250" y="505" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="14" font-weight="500" fill="#4A6B94" text-anchor="middle" letter-spacing="0.5">Irrigation Resource &amp; Fuel Authorization System</text>
+  <text x="250" y="490" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="14" font-weight="600" fill="#4A6B94" text-anchor="middle" letter-spacing="0.5">ዲጂታል የነዳጅ ኩፖን ሥርዓት</text>
 </svg>

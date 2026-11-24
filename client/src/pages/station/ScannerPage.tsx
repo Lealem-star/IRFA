@@ -425,7 +425,7 @@ export const ScannerPage: React.FC = () => {
               <div className="text-center pb-3 border-b border-gov-line flex flex-col items-center">
                 <img
                   src="/branding/irfa-mark.svg"
-                  alt="IRFA Logo"
+                  alt="Digital Fuel Coupon System Logo"
                   className="w-10 h-10 object-contain mb-1.5"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = '/branding/irfa-logo.png';
@@ -433,7 +433,7 @@ export const ScannerPage: React.FC = () => {
                 />
                 <div className="text-sm font-extrabold text-gov-ink">የባሕር ዳር ከተማ አስተዳደር ግብርና መምሪያ</div>
                 <div className="text-[11px] font-bold text-[#1E5285]">Bahir Dar City Administration Office of Agriculture</div>
-                <div className="text-[10px] text-gov-muted mt-0.5">IRFA Irrigation Fuel Dispensing Receipt</div>
+                <div className="text-[10px] text-gov-muted mt-0.5">Digital Fuel Coupon System Dispensing Receipt</div>
                 <div className="font-mono font-bold text-gov-blue text-xs mt-1">
                   Receipt #{dispenseSuccess.receipt.receiptNumber}
                 </div>

@@ -17,7 +17,7 @@ export const A4BatchCardSheet: React.FC<A4BatchCardSheetProps> = ({
     <div id="printable-batch-sheet" className="a4-sheet-container bg-white p-[8mm] shadow-lg print:shadow-none print:p-0">
       {/* Cut guide header for print preview only */}
       <div className="hidden print:block text-[8pt] font-mono text-gray-500 pb-[3mm] border-b border-gray-300 mb-[4mm]">
-        <span>IRFA Official Farmer Digital ID Cards · Bahir Dar City Administration Office of Agriculture (A4 Cut Sheet)</span>
+        <span>Digital Fuel Coupon System · Bahir Dar City Administration Office of Agriculture (A4 Cut Sheet)</span>
         <span className="float-right">{new Date().toLocaleDateString()}</span>
       </div>
 

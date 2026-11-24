@@ -106,14 +106,14 @@ export const Sidebar: React.FC = () => {
       <div className="flex items-center gap-3 pb-6 border-b border-[#31435a] cursor-pointer" onClick={() => navigate('/dashboard')}>
         <img
           src="/branding/irfa-mark.svg"
-          alt="IRFA Logo"
+          alt="Digital Fuel Coupon System Logo"
           className="w-10 h-10 object-contain drop-shadow-sm shrink-0"
           onError={(e) => {
             (e.target as HTMLImageElement).src = '/branding/irfa-logo.png';
           }}
         />
         <div className="overflow-hidden">
-          <h2 className="text-[14px] font-bold leading-tight m-0 text-white tracking-wide">IRFA</h2>
+          <h2 className="text-[12px] font-bold leading-tight m-0 text-white tracking-tight">Digital Fuel Coupon System</h2>
           <p className="text-[10px] text-[#aebbd0] m-0 mt-0.5 truncate font-medium">የባሕር ዳር ከተማ አስተዳደር ግብርና መምሪያ</p>
           <p className="text-[9px] text-[#7a8ea8] m-0 leading-tight truncate">Office of Agriculture</p>
         </div>

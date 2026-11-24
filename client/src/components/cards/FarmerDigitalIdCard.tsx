@@ -85,7 +85,7 @@ export const FarmerDigitalIdCard: React.FC<FarmerDigitalIdCardProps> = ({
         <div className="flex items-center gap-[2mm]">
           <img
             src="/branding/irfa-mark.svg"
-            alt="IRFA"
+            alt="Digital Fuel Coupon System"
             className="w-[7.5mm] h-[7.5mm] object-contain drop-shadow-xs"
             onError={(e) => {
               (e.target as HTMLImageElement).src = '/branding/irfa-logo.png';
@@ -102,11 +102,11 @@ export const FarmerDigitalIdCard: React.FC<FarmerDigitalIdCardProps> = ({
         </div>
 
         <div className="text-right">
-          <span className="text-[5pt] font-mono font-bold uppercase tracking-wider bg-white/20 text-white px-[1.5mm] py-[0.3mm] rounded-[1mm]">
-            IRFA
+          <span className="text-[4.5pt] font-mono font-bold uppercase tracking-wider bg-white/20 text-white px-[1.5mm] py-[0.3mm] rounded-[1mm]">
+            DFCS
           </span>
           <div className="text-[4.5pt] font-extrabold text-amber-300 uppercase tracking-widest mt-[0.5mm]">
-            FARMER IDENTITY
+            DIGITAL FUEL COUPON
           </div>
         </div>
       </div>
@@ -219,7 +219,7 @@ export const FarmerDigitalIdCard: React.FC<FarmerDigitalIdCardProps> = ({
       {/* Top Strip */}
       <div className="bg-[#12315B] text-white px-[3mm] py-[1.2mm] flex items-center justify-between shrink-0">
         <span className="text-[5pt] font-bold tracking-wider text-blue-200 uppercase">
-          IRFA DIGITAL VERIFICATION
+          DIGITAL FUEL COUPON VERIFICATION
         </span>
         <span className="text-[5pt] font-mono text-gray-300">
           ID: {farmer.farmerCode}
@@ -248,10 +248,10 @@ export const FarmerDigitalIdCard: React.FC<FarmerDigitalIdCardProps> = ({
               <ShieldCheck size={11} className="text-[#1686D9] shrink-0 mt-[0.5mm]" />
               <div>
                 <p className="text-[5.5pt] font-bold text-gray-900 leading-tight m-0">
-                  የገበሬውን መረጃ እና የነዳጅ ፈቃድ ለማረጋገጥ QR ኮዱን በIRFA ስርዓት ይቃኙ።
+                  የገበሬውን መረጃ እና የነዳጅ ፈቃድ ለማረጋገጥ QR ኮዱን በዲጂታል ነዳጅ ኩፖን ሥርዓት (Digital Fuel Coupon System) ይቃኙ።
                 </p>
                 <p className="text-[4.8pt] font-medium text-gray-600 leading-tight m-0 mt-[0.3mm]">
-                  Scan this QR code through the official IRFA system to verify farmer identity and current fuel authorization.
+                  Scan this QR code through the official Digital Fuel Coupon System to verify farmer identity and current fuel authorization.
                 </p>
               </div>
             </div>
@@ -259,10 +259,10 @@ export const FarmerDigitalIdCard: React.FC<FarmerDigitalIdCardProps> = ({
             {/* Disclaimer Block */}
             <div className="bg-amber-50/80 border border-amber-200/80 rounded-[1mm] p-[1.2mm] text-amber-900">
               <p className="text-[4.8pt] font-bold leading-tight m-0">
-                ይህ ካርድ በራሱ የነዳጅ መስጫ ፈቃድ አይደለም። ነዳጅ የሚሰጠው በIRFA ስርዓት የተረጋገጠ ወቅታዊ ፈቃድ እና ቀሪ መጠን ሲኖር ብቻ ነው።
+                ይህ ካርድ በራሱ የነዳጅ መስጫ ፈቃድ አይደለም። ነዳጅ የሚሰጠው በDigital Fuel Coupon System የተረጋገጠ ወቅታዊ ፈቃድ እና ቀሪ መጠን ሲኖር ብቻ ነው።
               </p>
               <p className="text-[4.2pt] font-medium text-amber-800 leading-tight m-0 mt-[0.4mm]">
-                This card is an identity credential, not an unlimited fuel coupon. Dispensing is subject to live authorization and balance verification through IRFA.
+                This card is an identity credential, not an unlimited fuel coupon. Dispensing is subject to live authorization and balance verification through Digital Fuel Coupon System.
               </p>
             </div>
           </div>

@@ -32,7 +32,7 @@ app.use('/uploads', express.static(uploadsPath, {
 app.get('/api/health', (_req, res) => {
   res.json({
     status: 'ok',
-    system: 'IRFA — Irrigation Resource & Fuel Authorization System',
+    system: 'Digital Fuel Coupon System — Bahir Dar City Administration Office of Agriculture',
     administration: 'Bahir Dar City Administration Office of Agriculture (የባሕር ዳር ከተማ አስተዳደር ግብርና መምሪያ)',
     timestamp: new Date().toISOString(),
   });

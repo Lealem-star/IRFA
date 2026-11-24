@@ -12,7 +12,7 @@ export const MainLayout: React.FC = () => {
       <div className="min-h-screen bg-gov-bg flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-3 border-gov-blue border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-sm font-medium text-gov-muted">Connecting to IRFA System...</p>
+          <p className="text-sm font-medium text-gov-muted">Connecting to Digital Fuel Coupon System...</p>
         </div>
       </div>
     );

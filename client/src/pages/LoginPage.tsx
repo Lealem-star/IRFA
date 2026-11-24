@@ -53,7 +53,7 @@ export const LoginPage: React.FC = () => {
           <div className="w-20 h-20 sm:w-24 sm:h-24 mb-2 drop-shadow-[0_6px_16px_rgba(18,49,91,0.25)] transition-transform hover:scale-105 duration-300">
             <img
               src="/branding/irfa-mark.svg"
-              alt="IRFA Office of Agriculture Emblem"
+              alt="Digital Fuel Coupon System Emblem"
               className="w-full h-full object-contain"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = '/branding/irfa-logo.png';
@@ -61,9 +61,9 @@ export const LoginPage: React.FC = () => {
             />
           </div>
 
-          {/* 2. IRFA Title */}
-          <h1 className="text-3xl sm:text-4xl font-black text-[#12315B] tracking-wider leading-none drop-shadow-xs">
-            IRFA
+          {/* 2. Digital Fuel Coupon System Title */}
+          <h1 className="text-2xl sm:text-3xl font-black text-[#12315B] tracking-tight leading-tight text-center drop-shadow-xs max-w-[340px]">
+            Digital Fuel Coupon System
           </h1>
         </div>
 

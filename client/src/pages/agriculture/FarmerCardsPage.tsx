@@ -140,7 +140,7 @@ export const FarmerCardsPage: React.FC = () => {
             Farmer Cards &amp; QR Identity
           </h1>
           <p className="text-xs text-gov-muted">
-            Official government-style wallet-size ID cards with passport photos and secure IRFA verification tokens
+            Official government-style wallet-size ID cards with passport photos and secure Digital Fuel Coupon System verification tokens
           </p>
         </div>
 
