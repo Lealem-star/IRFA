@@ -88,8 +88,8 @@ export const ScannerPage: React.FC = () => {
     } catch (err: any) {
       setError(
         err.response?.data?.rejectionReason ||
-          err.response?.data?.message ||
-          'Verification failed: Record not eligible or invalid.'
+        err.response?.data?.message ||
+        'Verification failed: Record not eligible or invalid.'
       );
     } finally {
       setLoading(false);

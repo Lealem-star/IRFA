@@ -132,10 +132,9 @@ export const Sidebar: React.FC = () => {
                   key={item.path}
                   to={item.path}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 w-full px-3 py-2.5 rounded-[10px] text-[13px] font-medium transition-colors ${
-                      isActive
-                        ? 'bg-[#244465] text-white shadow-sm'
-                        : 'text-[#c8d4e5] hover:bg-[#223b5a] hover:text-white'
+                    `flex items-center gap-3 w-full px-3 py-2.5 rounded-[10px] text-[13px] font-medium transition-colors ${isActive
+                      ? 'bg-[#244465] text-white shadow-sm'
+                      : 'text-[#c8d4e5] hover:bg-[#223b5a] hover:text-white'
                     }`
                   }
                 >
@@ -156,10 +155,10 @@ export const Sidebar: React.FC = () => {
             {user.role === 'AGRICULTURE_OFFICE'
               ? 'AG'
               : user.role === 'TRADE_OFFICE'
-              ? 'TR'
-              : user.role === 'STATION_ADMIN'
-              ? 'FS'
-              : 'SA'}
+                ? 'TR'
+                : user.role === 'STATION_ADMIN'
+                  ? 'FS'
+                  : 'SA'}
           </span>
         </div>
         <button
