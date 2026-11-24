@@ -108,7 +108,7 @@ export const Sidebar: React.FC = () => {
       {/* Brand */}
       <div className="flex items-center gap-3 pb-6 border-b border-[#31435a] cursor-pointer" onClick={() => navigate('/dashboard')}>
         <img
-          src="/branding/irfa-mark.svg"
+          src="/branding/dfcs-logo.png"
           alt="Digital Fuel Coupon System Logo"
           className="w-10 h-10 object-contain drop-shadow-sm shrink-0"
           onError={(e) => {

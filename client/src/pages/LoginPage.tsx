@@ -49,10 +49,10 @@ export const LoginPage: React.FC = () => {
       <div className="w-full max-w-[360px] sm:max-w-[380px] my-auto relative z-10 flex flex-col items-center">
         {/* ================= Institutional Branding Header (Logo & Single-Line Title) ================= */}
         <div className="text-center mb-6 flex flex-col items-center">
-          {/* 1. Real SVG Logo Emblem */}
-          <div className="w-16 h-16 sm:w-20 sm:h-20 mb-2.5 drop-shadow-[0_4px_14px_rgba(18,49,91,0.25)] transition-transform hover:scale-105 duration-300">
+          {/* 1. Dedicated System Logo Emblem */}
+          <div className="w-24 h-24 sm:w-28 sm:h-28 mb-3 drop-shadow-[0_4px_16px_rgba(18,49,91,0.3)] transition-transform hover:scale-105 duration-300">
             <img
-              src="/branding/irfa-mark.svg"
+              src="/branding/dfcs-logo.png"
               alt="Digital Fuel Coupon System Emblem"
               className="w-full h-full object-contain"
               onError={(e) => {

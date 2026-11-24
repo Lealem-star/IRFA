@@ -76,17 +76,17 @@ export const FarmerDigitalIdCard: React.FC<FarmerDigitalIdCardProps> = ({
       }}
     >
       {/* Background Watermark Pattern */}
-      <div className="absolute right-[-8mm] bottom-[-8mm] opacity-[0.06] w-[42mm] h-[42mm] pointer-events-none select-none">
-        <img src="/branding/irfa-mark.svg" alt="" className="w-full h-full object-contain" />
+      <div className="absolute right-[-6mm] bottom-[-6mm] opacity-[0.07] w-[44mm] h-[44mm] pointer-events-none select-none">
+        <img src="/branding/dfcs-logo.png" alt="" className="w-full h-full object-contain" />
       </div>
 
       {/* Top Government Header Strip */}
       <div className="bg-[#12315B] text-white px-[3mm] py-[1.8mm] flex items-center justify-between border-b border-[#0D2444] shrink-0">
         <div className="flex items-center gap-[2mm]">
           <img
-            src="/branding/irfa-mark.svg"
-            alt="Digital Fuel Coupon System"
-            className="w-[7.5mm] h-[7.5mm] object-contain drop-shadow-xs"
+            src="/branding/official-bureau-emblem.jpg"
+            alt="Office of Agriculture Emblem"
+            className="w-[7.5mm] h-[7.5mm] object-contain drop-shadow-xs rounded-full bg-white p-[0.3mm]"
             onError={(e) => {
               (e.target as HTMLImageElement).src = '/branding/irfa-logo.png';
             }}
@@ -101,13 +101,16 @@ export const FarmerDigitalIdCard: React.FC<FarmerDigitalIdCardProps> = ({
           </div>
         </div>
 
-        <div className="text-right">
-          <span className="text-[4.5pt] font-mono font-bold uppercase tracking-wider bg-white/20 text-white px-[1.5mm] py-[0.3mm] rounded-[1mm]">
-            DFCS
-          </span>
-          <div className="text-[4.5pt] font-extrabold text-amber-300 uppercase tracking-widest mt-[0.5mm]">
-            DIGITAL FUEL COUPON
-          </div>
+        {/* Dedicated DFCS System Logo instead of plain text */}
+        <div className="flex items-center">
+          <img
+            src="/branding/dfcs-logo.png"
+            alt="Digital Fuel Coupon System Logo"
+            className="h-[8.5mm] max-w-[26mm] object-contain drop-shadow-xs"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = '/branding/irfa-logo.png';
+            }}
+          />
         </div>
       </div>
 
@@ -218,9 +221,16 @@ export const FarmerDigitalIdCard: React.FC<FarmerDigitalIdCardProps> = ({
     >
       {/* Top Strip */}
       <div className="bg-[#12315B] text-white px-[3mm] py-[1.2mm] flex items-center justify-between shrink-0">
-        <span className="text-[5pt] font-bold tracking-wider text-blue-200 uppercase">
-          DIGITAL FUEL COUPON VERIFICATION
-        </span>
+        <div className="flex items-center gap-[1.5mm]">
+          <img
+            src="/branding/dfcs-logo.png"
+            alt="DFCS"
+            className="h-[4.5mm] object-contain"
+          />
+          <span className="text-[5pt] font-bold tracking-wider text-blue-200 uppercase">
+            DIGITAL FUEL COUPON VERIFICATION
+          </span>
+        </div>
         <span className="text-[5pt] font-mono text-gray-300">
           ID: {farmer.farmerCode}
         </span>

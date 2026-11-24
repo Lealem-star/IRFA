@@ -425,9 +425,9 @@ export const ScannerPage: React.FC = () => {
             <div id="printable-card" className="p-6 space-y-4 text-xs">
               <div className="text-center pb-3 border-b border-gov-line flex flex-col items-center">
                 <img
-                  src="/branding/irfa-mark.svg"
+                  src="/branding/dfcs-logo.png"
                   alt="Digital Fuel Coupon System Logo"
-                  className="w-10 h-10 object-contain mb-1.5"
+                  className="w-12 h-12 object-contain mb-1.5"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = '/branding/irfa-logo.png';
                   }}
