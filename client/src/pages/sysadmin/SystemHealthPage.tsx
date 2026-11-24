@@ -69,7 +69,7 @@ export const SystemHealthPage: React.FC = () => {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gov-muted">Owner Directorate:</span>
-              <span className="font-medium text-gov-ink">ባህርዳር ግብርና መምሪያ (Bahir Dar Agriculture Directorate)</span>
+              <span className="font-medium text-gov-ink">የባሕር ዳር ከተማ አስተዳደር ግብርና መምሪያ (Bahir Dar City Administration Office of Agriculture)</span>
             </div>
           </div>
         </div>

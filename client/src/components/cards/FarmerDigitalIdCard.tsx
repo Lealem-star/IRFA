@@ -93,10 +93,10 @@ export const FarmerDigitalIdCard: React.FC<FarmerDigitalIdCardProps> = ({
           />
           <div className="leading-tight">
             <div className="text-[7.5pt] font-black tracking-wide text-white leading-none">
-              ባህርዳር ግብርና መምሪያ
+              የባሕር ዳር ከተማ አስተዳደር ግብርና መምሪያ
             </div>
             <div className="text-[5.5pt] font-bold text-blue-200 tracking-tight leading-none mt-[0.5mm]">
-              BAHIR DAR AGRICULTURE DIRECTORATE
+              BAHIR DAR CITY ADMINISTRATION OFFICE OF AGRICULTURE
             </div>
           </div>
         </div>
@@ -282,7 +282,7 @@ export const FarmerDigitalIdCard: React.FC<FarmerDigitalIdCardProps> = ({
       {/* Bottom Legal Footer */}
       <div className="bg-gray-100 text-gray-600 text-[4.5pt] px-[3mm] py-[1mm] border-t border-gray-200 flex justify-between items-center shrink-0">
         <span className="font-bold text-gray-700">
-          ባህርዳር ግብርና መምሪያ · Bahir Dar Agriculture Directorate
+          የባሕር ዳር ከተማ አስተዳደር ግብርና መምሪያ · Bahir Dar City Administration Office of Agriculture
         </span>
         <span className="font-mono text-gray-500">Property of Government</span>
       </div>

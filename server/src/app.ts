@@ -33,7 +33,7 @@ app.get('/api/health', (_req, res) => {
   res.json({
     status: 'ok',
     system: 'IRFA — Irrigation Resource & Fuel Authorization System',
-    administration: 'Bahir Dar Agriculture Directorate (ባህርዳር ግብርና መምሪያ)',
+    administration: 'Bahir Dar City Administration Office of Agriculture (የባሕር ዳር ከተማ አስተዳደር ግብርና መምሪያ)',
     timestamp: new Date().toISOString(),
   });
 });

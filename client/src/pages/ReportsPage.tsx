@@ -61,7 +61,7 @@ export const ReportsPage: React.FC = () => {
             Departmental Reports & Distribution Monitoring
           </h1>
           <p className="text-xs text-gov-muted">
-            Audited statistics for Bahir Dar Agriculture Directorate (ባህርዳር ግብርና መምሪያ) fuel authorization program
+            Audited statistics for Bahir Dar City Administration Office of Agriculture (የባሕር ዳር ከተማ አስተዳደር ግብርና መምሪያ) fuel authorization program
           </p>
         </div>
 

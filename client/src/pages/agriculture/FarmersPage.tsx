@@ -401,7 +401,7 @@ Getachew Reda,+251 918 883 344,ETH-BD-2024-1012,3.2,Diesel,14 HP,Tomato`
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-gov-ink m-0">Register New Irrigation Farmer</h3>
-                  <p className="text-[11px] text-gov-muted m-0">ባህርዳር ግብርና መምሪያ · Bahir Dar Agriculture Directorate</p>
+                  <p className="text-[11px] text-gov-muted m-0">የባሕር ዳር ከተማ አስተዳደር ግብርና መምሪያ · Bahir Dar City Administration Office of Agriculture</p>
                 </div>
               </div>
               <button

@@ -431,8 +431,8 @@ export const ScannerPage: React.FC = () => {
                     (e.target as HTMLImageElement).src = '/branding/irfa-logo.png';
                   }}
                 />
-                <div className="text-sm font-extrabold text-gov-ink">ባህርዳር ግብርና መምሪያ</div>
-                <div className="text-[11px] font-bold text-[#1E5285]">Bahir Dar Agriculture Directorate</div>
+                <div className="text-sm font-extrabold text-gov-ink">የባሕር ዳር ከተማ አስተዳደር ግብርና መምሪያ</div>
+                <div className="text-[11px] font-bold text-[#1E5285]">Bahir Dar City Administration Office of Agriculture</div>
                 <div className="text-[10px] text-gov-muted mt-0.5">IRFA Irrigation Fuel Dispensing Receipt</div>
                 <div className="font-mono font-bold text-gov-blue text-xs mt-1">
                   Receipt #{dispenseSuccess.receipt.receiptNumber}

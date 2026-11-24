@@ -14,7 +14,7 @@ async function startServer() {
 
     app.listen(PORT, () => {
       console.log(`IRFA Server is running at http://localhost:${PORT}`);
-      console.log(`Target: Bahir Dar Agriculture Directorate (ባህርዳር ግብርና መምሪያ), Ethiopia`);
+      console.log(`Target: Bahir Dar City Administration Office of Agriculture (የባሕር ዳር ከተማ አስተዳደር ግብርና መምሪያ), Ethiopia`);
     });
   } catch (err) {
     console.error('Failed to initialize server or database connection:', err);

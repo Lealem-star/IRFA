@@ -114,8 +114,8 @@ export const Sidebar: React.FC = () => {
         />
         <div className="overflow-hidden">
           <h2 className="text-[14px] font-bold leading-tight m-0 text-white tracking-wide">IRFA</h2>
-          <p className="text-[10px] text-[#aebbd0] m-0 mt-0.5 truncate font-medium">ባህርዳር ግብርና መምሪያ</p>
-          <p className="text-[9px] text-[#7a8ea8] m-0 leading-tight truncate">Agriculture Directorate</p>
+          <p className="text-[10px] text-[#aebbd0] m-0 mt-0.5 truncate font-medium">የባሕር ዳር ከተማ አስተዳደር ግብርና መምሪያ</p>
+          <p className="text-[9px] text-[#7a8ea8] m-0 leading-tight truncate">Office of Agriculture</p>
         </div>
       </div>
 

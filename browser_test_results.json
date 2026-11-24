@@ -2,10 +2,10 @@
   "results": [
     {
       "suite": "TEST 1 — APPLICATION & AUTHENTICATION",
-      "testCase": "Minimal institutional login layout & Bahir Dar Agriculture Directorate branding",
+      "testCase": "Minimal institutional login layout & Bahir Dar City Administration Office of Agriculture branding",
       "role": "Public / Unauthenticated",
-      "expected": "Title \"IRFA | Bahir Dar Agriculture Directorate\" with Amharic and English institutional branding",
-      "actual": "Title: \"IRFA | Bahir Dar Agriculture Directorate\", Directorate branding: true, Logo: true",
+      "expected": "Title \"IRFA | Bahir Dar City Administration Office of Agriculture\" with Amharic and English institutional branding",
+      "actual": "Title: \"IRFA | Bahir Dar City Administration Office of Agriculture\", Office branding: true, Logo: true",
       "status": "PASS"
     },
     {

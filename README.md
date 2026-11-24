@@ -1,12 +1,12 @@
 # IRFA — Irrigation Resource & Fuel Authorization System
-### Bahir Dar Agriculture Directorate, Amhara Region, Ethiopia
-**ባህርዳር ግብርና መምሪያ — የመስኖ አርሶ አደሮች ነዳጅ ፈቃድና ቁጥጥር ሥርዓት**  
-*Powered & Developed by Enqopa Technologies PLC*
+### Bahir Dar City Administration Office of Agriculture, Amhara Region, Ethiopia
+**የባሕር ዳር ከተማ አስተዳደር ግብርና መምሪያ — የመስኖ አርሶ አደሮች ነዳጅ ፈቃድና ቁጥጥር ሥርዓት**  
+*Powered by Bahir Dar City Administration Office of Agriculture · Developed by Enqopa Technologies PLC*
 
 ---
 
 ## 1. Overview
-The **Irrigation Resource & Fuel Authorization System (IRFA)** is an enterprise web application engineered for the **Bahir Dar Agriculture Directorate** (*ባህርዳር ግብርና መምሪያ*), Amhara Region, Ethiopia. It manages the registration of verified irrigation farmers operating along Lake Tana and the Blue Nile basin, oversees monthly fuel quota allocations (Diesel and Benzene), streamlines inter-office fuel request approvals between the Agriculture Directorate and the Trade & Market Development Office, issues official ISO/IEC 7810 ID-1 wallet-size dual-sided Farmer Digital ID cards with photographs, and provides real-time QR-based verification and atomic fuel dispensing at authorized stations.
+The **Irrigation Resource & Fuel Authorization System (IRFA)** is an enterprise web application engineered for the **Bahir Dar City Administration Office of Agriculture** (*የባሕር ዳር ከተማ አስተዳደር ግብርና መምሪያ*), Amhara Region, Ethiopia. It manages the registration of verified irrigation farmers operating along Lake Tana and the Blue Nile basin, oversees monthly fuel quota allocations (Diesel and Benzene), streamlines inter-office fuel request approvals between the Agriculture Office and the Trade & Market Development Office, issues official ISO/IEC 7810 ID-1 wallet-size dual-sided Farmer Digital ID cards with photographs, and provides real-time QR-based verification and atomic fuel dispensing at authorized stations.
 
 ---
 
@@ -161,5 +161,5 @@ IRFA/
 ---
 
 ## 8. Institutional Ownership & Credits
-- **Institutional Owner:** **Bahir Dar Agriculture Directorate** (*ባህርዳር ግብርና መምሪያ*), Amhara Region, Ethiopia.
-- **Technology Partner:** **Enqopa Technologies PLC** (Powered & Developed by Enqopa Technologies PLC).
+- **Institutional Owner:** **Bahir Dar City Administration Office of Agriculture** (*የባሕር ዳር ከተማ አስተዳደር ግብርና መምሪያ*), Amhara Region, Ethiopia.
+- **Technology Partner:** **Enqopa Technologies PLC** (Powered by Bahir Dar City Administration Office of Agriculture · Developed by Enqopa Technologies PLC).

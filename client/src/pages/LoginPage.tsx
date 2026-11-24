@@ -53,7 +53,7 @@ export const LoginPage: React.FC = () => {
           <div className="w-20 h-20 sm:w-24 sm:h-24 mb-2 drop-shadow-[0_6px_16px_rgba(18,49,91,0.25)] transition-transform hover:scale-105 duration-300">
             <img
               src="/branding/irfa-mark.svg"
-              alt="IRFA Agriculture Directorate Emblem"
+              alt="IRFA Office of Agriculture Emblem"
               className="w-full h-full object-contain"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = '/branding/irfa-logo.png';
@@ -188,16 +188,16 @@ export const LoginPage: React.FC = () => {
           {/* Institutional Identity */}
           <div className="inline-block bg-white/80 backdrop-blur-xs px-4 py-1.5 rounded-xl shadow-xs border border-white/60">
             <p className="text-xs sm:text-[13px] font-bold text-[#12315B] tracking-wide leading-snug">
-              ባህርዳር ግብርና መምሪያ
+              የባሕር ዳር ከተማ አስተዳደር ግብርና መምሪያ
             </p>
             <p className="text-[11px] font-semibold text-[#1E5285] tracking-tight mt-0.5">
-              Bahir Dar Agriculture Directorate
+              Bahir Dar City Administration Office of Agriculture
             </p>
           </div>
 
           {/* Technology Credits */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-[10px] text-gray-700 bg-white/70 backdrop-blur-xs px-3.5 py-1 rounded-lg shadow-xs border border-white/40">
-            <span className="font-medium">Powered by Enqopa Technologies PLC</span>
+            <span className="font-medium">Powered by Bahir Dar City Administration Office of Agriculture</span>
             <span className="hidden sm:inline text-gray-400">·</span>
             <span className="font-semibold text-gray-800">Developed by Enqopa Technologies PLC</span>
           </div>

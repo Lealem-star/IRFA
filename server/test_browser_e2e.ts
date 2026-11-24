@@ -93,17 +93,17 @@ async function runBrowserAcceptanceTests() {
     // 1.1 Minimal Institutional Landing / Login Page
     await page.goto(APP_URL, { waitUntil: 'networkidle2' });
     const landingTitle = await page.title();
-    const hasAmharicName = await page.evaluate(() => document.body.innerText.includes('ባህርዳር ግብርና መምሪያ'));
-    const hasEnglishName = await page.evaluate(() => document.body.innerText.includes('Bahir Dar Agriculture Directorate'));
+    const hasAmharicName = await page.evaluate(() => document.body.innerText.includes('የባሕር ዳር ከተማ አስተዳደር ግብርና መምሪያ'));
+    const hasEnglishName = await page.evaluate(() => document.body.innerText.includes('Bahir Dar City Administration Office of Agriculture'));
     const hasIrfaLogo = await page.evaluate(() => !!document.querySelector('img[alt*="IRFA"]'));
 
     results.push({
       suite: 'TEST 1 — APPLICATION & AUTHENTICATION',
-      testCase: 'Minimal institutional login layout & Bahir Dar Agriculture Directorate branding',
+      testCase: 'Minimal institutional login layout & Bahir Dar City Administration Office of Agriculture branding',
       role: 'Public / Unauthenticated',
-      expected: 'Title "IRFA | Bahir Dar Agriculture Directorate" with Amharic and English institutional branding',
-      actual: `Title: "${landingTitle}", Directorate branding: ${hasAmharicName && hasEnglishName}, Logo: ${hasIrfaLogo}`,
-      status: landingTitle.includes('Bahir Dar Agriculture Directorate') && hasAmharicName && hasEnglishName && hasIrfaLogo ? 'PASS' : 'FAIL',
+      expected: 'Title "IRFA | Bahir Dar City Administration Office of Agriculture" with Amharic and English institutional branding',
+      actual: `Title: "${landingTitle}", Office branding: ${hasAmharicName && hasEnglishName}, Logo: ${hasIrfaLogo}`,
+      status: landingTitle.includes('Bahir Dar City Administration Office of Agriculture') && hasAmharicName && hasEnglishName && hasIrfaLogo ? 'PASS' : 'FAIL',
     });
 
     // 1.2 Direct Centered Login Form Presentation
