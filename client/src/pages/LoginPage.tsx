@@ -197,7 +197,7 @@ export const LoginPage: React.FC = () => {
 
           {/* Technology Credits */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-[10px] text-gray-700 bg-white/70 backdrop-blur-xs px-3.5 py-1 rounded-lg shadow-xs border border-white/40">
-            <span className="font-medium">Powered by ባህርዳር ግብርና መምሪያ</span>
+            <span className="font-medium">Powered by Enqopa Technologies PLC</span>
             <span className="hidden sm:inline text-gray-400">·</span>
             <span className="font-semibold text-gray-800">Developed by Enqopa Technologies PLC</span>
           </div>
