@@ -4,6 +4,7 @@ import { Farmer } from '../../types';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { FarmerDigitalIdCard } from '../../components/cards/FarmerDigitalIdCard';
 import { A4BatchCardSheet } from '../../components/cards/A4BatchCardSheet';
+import { printFarmerCardDocument, printBatchCardsDocument } from '../../utils/print';
 import {
   QrCode,
   Printer,
@@ -103,7 +104,7 @@ export const FarmerCardsPage: React.FC = () => {
     } catch (err) {
       console.warn('Print log failed', err);
     }
-    window.print();
+    printFarmerCardDocument(selectedFarmer, cardSide);
   };
 
   const handlePrintBatch = async () => {
@@ -114,7 +115,7 @@ export const FarmerCardsPage: React.FC = () => {
     for (const f of targetFarmers) {
       api.post(`/farmers/${f.id}/cards/log-print`, { printType: 'BATCH_A4' }).catch(() => null);
     }
-    window.print();
+    printBatchCardsDocument(targetFarmers.length, batchSide);
   };
 
   const handleReissueCard = async (farmerId: string) => {

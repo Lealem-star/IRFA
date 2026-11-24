@@ -3,6 +3,7 @@ import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { VerificationResultData, FuelTransaction } from '../../types';
 import { StatusBadge } from '../../components/common/StatusBadge';
+import { printReceiptDocument } from '../../utils/print';
 import {
   ScanLine,
   Camera,
@@ -487,7 +488,13 @@ export const ScannerPage: React.FC = () => {
                 Close
               </button>
               <button
-                onClick={() => window.print()}
+                onClick={() =>
+                  printReceiptDocument(
+                    dispenseSuccess.receipt.receiptNumber,
+                    dispenseSuccess.receipt.farmer?.fullName,
+                    dispenseSuccess.receipt.farmer?.farmerCode
+                  )
+                }
                 className="px-4 py-2 bg-gov-blue hover:bg-gov-blueHover text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-sm"
               >
                 <Printer size={14} />

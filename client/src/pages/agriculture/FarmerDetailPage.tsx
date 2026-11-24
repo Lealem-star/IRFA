@@ -4,6 +4,7 @@ import api from '../../services/api';
 import { Farmer } from '../../types';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { FarmerDigitalIdCard } from '../../components/cards/FarmerDigitalIdCard';
+import { printFarmerCardDocument } from '../../utils/print';
 import {
   ArrowLeft,
   QrCode,
@@ -98,7 +99,7 @@ export const FarmerDetailPage: React.FC = () => {
     } catch (err) {
       console.warn('Print audit log failed', err);
     }
-    window.print();
+    printFarmerCardDocument(farmer, cardSide);
   };
 
   const handleToggleEligibility = async () => {
