@@ -162,34 +162,6 @@ export const LoginPage: React.FC = () => {
                 </>
               )}
             </button>
-
-            {/* Quick Demo Fill Pills */}
-            <div className="pt-2 text-center">
-              <div className="text-[10px] text-gray-600 font-medium mb-1.5">
-                Default Credentials (click to fill):
-              </div>
-              <div className="flex flex-wrap items-center justify-center gap-1.5">
-                {[
-                  { name: 'Admin', u: 'admin', p: 'demo123' },
-                  { name: 'Agriculture', u: 'agriculture', p: 'demo123' },
-                  { name: 'Trade', u: 'trade', p: 'demo123' },
-                  { name: 'Station', u: 'station', p: 'demo123' },
-                ].map((cred) => (
-                  <button
-                    key={cred.u}
-                    type="button"
-                    onClick={() => {
-                      setUsername(cred.u);
-                      setPassword(cred.p);
-                      setError(null);
-                    }}
-                    className="px-2 py-0.5 bg-white/70 hover:bg-white text-[#12315B] text-[10px] font-semibold rounded-md border border-gray-200/80 shadow-2xs transition-all hover:scale-105 cursor-pointer"
-                  >
-                    {cred.name}
-                  </button>
-                ))}
-              </div>
-            </div>
           </form>
         </div>
       </div>

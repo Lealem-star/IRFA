@@ -24,16 +24,22 @@ export const DashboardPage: React.FC = () => {
 
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchStats = async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await api.get('/dashboard/stats');
       if (res.data.success) {
         setData(res.data);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to load dashboard metrics', err);
+      setError(
+        err.response?.data?.message ||
+        'Unable to connect to Central Ledger. Please verify network and tap Refresh.'
+      );
     } finally {
       setLoading(false);
     }
@@ -104,6 +110,19 @@ export const DashboardPage: React.FC = () => {
           <span className="text-[11px] sm:text-xs">Refresh</span>
         </button>
       </div>
+
+      {/* Honest Error State on Connection or Server Failure */}
+      {error && !data && (
+        <div className="p-3.5 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs flex items-center justify-between gap-2 shadow-xs">
+          <span>{error}</span>
+          <button
+            onClick={fetchStats}
+            className="font-bold underline hover:text-red-900 shrink-0 cursor-pointer"
+          >
+            Retry Connection
+          </button>
+        </div>
+      )}
 
       {/* 4 Stat Cards Grid */}
       {user?.role === 'STATION_ADMIN' ? (

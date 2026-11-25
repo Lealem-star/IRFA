@@ -11,7 +11,6 @@ import {
   ZapOff,
   SwitchCamera,
   Search,
-  Sparkles,
   AlertCircle,
   RefreshCw,
   Camera,
@@ -23,7 +22,6 @@ interface ScannerCameraViewProps {
   stationCode: string;
   onScanSuccess: (decodedToken: string) => void;
   onOpenManualEntry: () => void;
-  onOpenDemoMenu: () => void;
   onExit: () => void;
 }
 
@@ -34,7 +32,6 @@ export const ScannerCameraView: React.FC<ScannerCameraViewProps> = ({
   stationCode,
   onScanSuccess,
   onOpenManualEntry,
-  onOpenDemoMenu,
   onExit,
 }) => {
   const [status, setStatus] = useState<CameraStatus>('INITIALIZING');
@@ -358,26 +355,16 @@ export const ScannerCameraView: React.FC<ScannerCameraViewProps> = ({
         )}
       </div>
 
-      {/* Bottom Secondary Actions Bar */}
-      <div className="relative z-20 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-gradient-to-t from-black/90 via-black/60 to-transparent flex items-center justify-between gap-3">
-        {/* Demo Mode Button */}
-        <button
-          type="button"
-          onClick={onOpenDemoMenu}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 active:scale-95 text-white text-xs font-semibold backdrop-blur-md transition-all cursor-pointer border border-white/10"
-        >
-          <Sparkles size={14} className="text-amber-400" />
-          <span>Demo Shortcuts</span>
-        </button>
-
-        {/* Manual Verification Button */}
+      {/* Bottom Operational Action Bar */}
+      <div className="relative z-20 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-gradient-to-t from-black/90 via-black/60 to-transparent flex items-center justify-center">
+        {/* Manual Verification Button (Operational Fallback) */}
         <button
           type="button"
           onClick={onOpenManualEntry}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-bold shadow-md shadow-blue-600/30 transition-all cursor-pointer"
+          className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 active:scale-95 text-white text-xs font-bold backdrop-blur-md transition-all cursor-pointer border border-white/20 shadow-lg"
         >
-          <Search size={14} />
-          <span>Manual Entry</span>
+          <Search size={15} />
+          <span>Enter Farmer ID Manually</span>
         </button>
       </div>
     </div>

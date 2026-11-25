@@ -4,6 +4,13 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
+  // CRITICAL SAFETY GUARD: Prevent accidental execution in production environment
+  if (process.env.NODE_ENV === 'production' && !process.env.FORCE_PRODUCTION_SEED) {
+    console.error('CRITICAL ABORT: seed.ts execution blocked because NODE_ENV=production.');
+    console.error('This script wipes database tables. It must NEVER run in a live government production deployment.');
+    process.exit(1);
+  }
+
   console.log('Seeding IRFA Database for Bahir Dar City Administration...');
 
   // Clean existing tables in reverse order of foreign keys

@@ -9,7 +9,6 @@ import { ScannerRejectedView } from './scanner/ScannerRejectedView';
 import { ScannerDispenseView } from './scanner/ScannerDispenseView';
 import { ScannerReceiptView } from './scanner/ScannerReceiptView';
 import { ScannerManualModal } from './scanner/ScannerManualModal';
-import { ScannerDemoModal } from './scanner/ScannerDemoModal';
 import { Loader2 } from 'lucide-react';
 
 export type StationWorkflowStep =
@@ -41,7 +40,6 @@ export const ScannerPage: React.FC = () => {
 
   // Modal Dialogs
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
-  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
 
   const stationName = user?.fuelStation?.name || 'Tana Energy Fuel Station';
   const stationCode = user?.fuelStation?.code || 'BD-ST-01';
@@ -54,7 +52,6 @@ export const ScannerPage: React.FC = () => {
     setIsVerifying(true);
     setStep('VERIFYING');
     setIsManualModalOpen(false);
-    setIsDemoModalOpen(false);
 
     try {
       const res = await api.post('/verification/verify', {
@@ -130,7 +127,6 @@ export const ScannerPage: React.FC = () => {
           stationCode={stationCode}
           onScanSuccess={executeVerification}
           onOpenManualEntry={() => setIsManualModalOpen(true)}
-          onOpenDemoMenu={() => setIsDemoModalOpen(true)}
           onExit={() => navigate('/dashboard')}
         />
       )}
@@ -202,13 +198,6 @@ export const ScannerPage: React.FC = () => {
         onClose={() => setIsManualModalOpen(false)}
         onSubmit={executeVerification}
         isLoading={isVerifying}
-      />
-
-      {/* Demo Shortcuts Modal Dialog */}
-      <ScannerDemoModal
-        isOpen={isDemoModalOpen}
-        onClose={() => setIsDemoModalOpen(false)}
-        onSelectFarmer={executeVerification}
       />
     </div>
   );

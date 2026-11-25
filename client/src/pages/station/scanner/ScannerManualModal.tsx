@@ -54,7 +54,7 @@ export const ScannerManualModal: React.FC<ScannerManualModalProps> = ({
                 autoFocus
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                placeholder="e.g. FR-00124 or BD-CARD-2026-..."
+                placeholder="Enter Farmer ID or Card Serial (e.g. FR-XXXXX)"
                 className="w-full pl-9 pr-3 py-2.5 border-2 border-slate-200 focus:border-blue-600 focus:outline-none rounded-xl text-xs sm:text-sm font-mono text-slate-900 bg-slate-50 focus:bg-white"
               />
               <Search size={15} className="absolute left-3 top-3.5 text-slate-400" />
