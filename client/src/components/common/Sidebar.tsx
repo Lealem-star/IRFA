@@ -104,7 +104,7 @@ export const Sidebar: React.FC = () => {
   const navGroups = roleNavConfig[user.role] || [];
 
   return (
-    <aside className="w-[248px] bg-[#14243b] text-white p-[22px_16px] flex flex-col min-h-screen shrink-0 border-r border-[#31435a]">
+    <aside className="hidden md:flex w-[248px] bg-[#14243b] text-white p-[22px_16px] flex-col min-h-screen shrink-0 border-r border-[#31435a]">
       {/* Brand */}
       <div className="flex items-center gap-3 pb-6 border-b border-[#31435a] cursor-pointer" onClick={() => navigate('/dashboard')}>
         <img

@@ -95,8 +95,60 @@ export const TransactionsPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Transactions Table matching prototype */}
-      <div className="bg-white border border-gov-line rounded-[13px] overflow-hidden shadow-sm">
+      {/* Mobile Card List View (Visible on screens < sm) */}
+      <div className="block sm:hidden space-y-3">
+        {transactions.map((tx) => (
+          <div
+            key={tx.id}
+            className="bg-white border border-gov-line rounded-xl p-3.5 shadow-2xs space-y-2.5"
+          >
+            <div className="flex items-center justify-between pb-2 border-b border-gray-100">
+              <span className="font-mono font-bold text-xs text-gov-blue">
+                #{tx.receiptNumber}
+              </span>
+              <StatusBadge status="RECORDED" size="sm" />
+            </div>
+
+            <div className="flex justify-between items-start text-xs">
+              <div>
+                <div className="font-bold text-gov-ink text-sm">{tx.farmer?.fullName || 'Beneficiary'}</div>
+                <div className="text-[11px] font-mono text-gov-muted">{tx.farmer?.farmerCode}</div>
+                <div className="text-[10px] text-gray-500 mt-0.5">{tx.fuelStation?.name}</div>
+              </div>
+              <div className="text-right shrink-0">
+                <div className="text-base font-extrabold text-gov-blue leading-tight">
+                  {tx.quantityLiters} L
+                </div>
+                <div className="text-[10px] text-gov-muted uppercase font-semibold">
+                  {tx.fuelType?.name || 'Diesel'}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-between items-center text-[11px] text-gov-muted pt-2 border-t border-dashed border-gray-100">
+              <span>
+                {new Date(tx.transactionDate).toLocaleDateString()}{' '}
+                {new Date(tx.transactionDate).toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </span>
+              <span className="font-extrabold text-gov-ink text-xs">
+                {Number(tx.totalAmount).toLocaleString()} ETB
+              </span>
+            </div>
+          </div>
+        ))}
+
+        {transactions.length === 0 && !loading && (
+          <div className="bg-white border border-gov-line rounded-xl p-6 text-center text-xs text-gov-muted">
+            No transactions recorded yet.
+          </div>
+        )}
+      </div>
+
+      {/* Desktop & Tablet Table (Visible on sm+) */}
+      <div className="hidden sm:block bg-white border border-gov-line rounded-[13px] overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>

@@ -166,32 +166,32 @@ export const ScannerPage: React.FC = () => {
       </div>
 
       {/* Verification Scanner & Search Box matching prototype */}
-      <div className="bg-white border border-gov-line rounded-[16px] p-6 shadow-sm">
-        <div className="border-2 border-dashed border-[#d4deee] bg-[#fafcff] rounded-[14px] p-8 text-center">
-          <div className="text-4xl text-gov-blue mb-2">▦</div>
-          <h3 className="text-base font-bold text-gov-ink mb-1">Scan Farmer QR Card</h3>
-          <p className="text-xs text-gov-muted max-w-[420px] mx-auto mb-5">
+      <div className="bg-white border border-gov-line rounded-[16px] p-4 sm:p-6 shadow-sm">
+        <div className="border-2 border-dashed border-[#d4deee] bg-[#fafcff] rounded-[14px] p-4 sm:p-8 text-center">
+          <div className="text-3xl sm:text-4xl text-gov-blue mb-2">▦</div>
+          <h3 className="text-base sm:text-lg font-bold text-gov-ink mb-1">Scan Farmer QR Card</h3>
+          <p className="text-xs text-gov-muted max-w-[420px] mx-auto mb-4 sm:mb-5">
             Use your device camera to scan the cryptographic QR code or manually enter the Farmer ID.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2.5 sm:gap-3">
             <button
               onClick={() => setShowCamera(!showCamera)}
-              className="bg-gov-blue hover:bg-gov-blueHover text-white px-5 py-2.5 rounded-[9px] font-semibold text-xs transition-colors shadow-sm inline-flex items-center gap-2"
+              className="w-full sm:w-auto bg-gov-blue hover:bg-gov-blueHover active:scale-[0.98] text-white px-6 py-3 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-sm inline-flex items-center justify-center gap-2"
             >
-              <Camera size={16} />
+              <Camera size={18} />
               <span>{showCamera ? 'Close Camera' : 'Start Camera Scanner'}</span>
             </button>
 
             {/* Quick Demo Scan Buttons */}
-            <div className="inline-flex gap-2">
+            <div className="flex items-center justify-center gap-2">
               <button
                 type="button"
                 onClick={() => {
                   setInputCode('FR-00124');
                   executeVerification('FR-00124');
                 }}
-                className="bg-white hover:bg-gray-50 border border-gov-line text-gov-ink px-3 py-2 rounded-lg text-xs font-semibold shadow-xs"
+                className="flex-1 sm:flex-none bg-white hover:bg-gray-50 border border-gov-line text-gov-ink px-3 py-2 rounded-lg text-xs font-semibold shadow-xs transition-colors"
               >
                 Demo: Abebe (FR-00124)
               </button>
@@ -201,7 +201,7 @@ export const ScannerPage: React.FC = () => {
                   setInputCode('FR-00127');
                   executeVerification('FR-00127');
                 }}
-                className="bg-white hover:bg-red-50 border border-red-200 text-red-600 px-3 py-2 rounded-lg text-xs font-semibold shadow-xs"
+                className="flex-1 sm:flex-none bg-white hover:bg-red-50 border border-red-200 text-red-600 px-3 py-2 rounded-lg text-xs font-semibold shadow-xs transition-colors"
               >
                 Demo: Suspended (FR-00127)
               </button>
@@ -210,28 +210,29 @@ export const ScannerPage: React.FC = () => {
 
           {/* Camera Frame Container */}
           {showCamera && (
-            <div className="mt-6 max-w-sm mx-auto bg-black rounded-xl overflow-hidden p-2 shadow-lg">
+            <div className="mt-5 max-w-xs sm:max-w-sm mx-auto bg-slate-950 rounded-2xl overflow-hidden p-2 shadow-xl border-2 border-blue-500">
               <div id="qr-reader" className="w-full"></div>
             </div>
           )}
 
-          {/* Manual Lookup Fallback matching prompt step 7 */}
-          <div className="mt-6 pt-5 border-t border-[#e2eaf5] max-w-md mx-auto">
+          {/* Manual Lookup Fallback */}
+          <div className="mt-5 pt-4 border-t border-[#e2eaf5] max-w-md mx-auto">
             <form onSubmit={handleManualSearch} className="flex gap-2">
               <div className="relative flex-1">
                 <input
                   type="text"
+                  inputMode="text"
                   value={inputCode}
                   onChange={(e) => setInputCode(e.target.value)}
-                  placeholder="Or enter Farmer ID e.g. FR-00124..."
-                  className="w-full pl-9 pr-3 py-2 border border-gov-line rounded-lg text-xs text-gov-ink focus:outline-none focus:border-gov-blue bg-white"
+                  placeholder="Enter Farmer ID e.g. FR-00124..."
+                  className="w-full pl-9 pr-3 py-2.5 border border-gov-line rounded-xl text-xs text-gov-ink focus:outline-none focus:border-gov-blue bg-white shadow-2xs"
                 />
-                <Search size={15} className="absolute left-3 top-2.5 text-gov-muted" />
+                <Search size={15} className="absolute left-3 top-3 text-gov-muted" />
               </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg text-xs font-semibold transition-colors disabled:opacity-50"
+                className="bg-gray-900 hover:bg-black text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all disabled:opacity-50 active:scale-95 shrink-0"
               >
                 {loading ? 'Verifying...' : 'Verify'}
               </button>
@@ -333,11 +334,54 @@ export const ScannerPage: React.FC = () => {
             </div>
 
             {/* ATOMIC FUEL DISPENSING FORM */}
-            <form onSubmit={handleDispenseSubmit} className="pt-2 border-t border-gov-line space-y-4">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-gov-ink flex items-center gap-1.5">
-                <Flame size={15} className="text-gov-blue" />
-                <span>Record Actual Fuel Dispensing</span>
-              </h4>
+            <form onSubmit={handleDispenseSubmit} className="pt-3 border-t border-gov-line space-y-4">
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-gov-ink flex items-center gap-1.5">
+                  <Flame size={16} className="text-gov-blue" />
+                  <span>Record Fuel Dispensing</span>
+                </h4>
+                <span className="text-[11px] font-bold text-gov-blue bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                  Avail: {verifiedData.authorization.remainingLiters} L
+                </span>
+              </div>
+
+              {/* Quick Volume Preset Chips for Fast Mobile Operation */}
+              <div>
+                <div className="text-[11px] font-semibold text-gray-500 mb-1.5">
+                  Quick Volume Selection:
+                </div>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {[10, 20, 30, 50, 80]
+                    .filter((qty) => qty <= Number(verifiedData.authorization.remainingLiters))
+                    .map((qty) => (
+                      <button
+                        key={qty}
+                        type="button"
+                        onClick={() => setDispenseLiters(qty)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
+                          dispenseLiters === qty
+                            ? 'bg-gov-blue text-white border-gov-blue shadow-xs'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200'
+                        }`}
+                      >
+                        {qty} L
+                      </button>
+                    ))}
+                  {Number(verifiedData.authorization.remainingLiters) > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setDispenseLiters(Number(verifiedData.authorization.remainingLiters))}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
+                        dispenseLiters === Number(verifiedData.authorization.remainingLiters)
+                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                          : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border-emerald-300'
+                      }`}
+                    >
+                      Full Balance ({verifiedData.authorization.remainingLiters} L)
+                    </button>
+                  )}
+                </div>
+              </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                 <div>
@@ -346,23 +390,21 @@ export const ScannerPage: React.FC = () => {
                   </label>
                   <input
                     type="number"
+                    inputMode="decimal"
                     min="1"
                     max={Number(verifiedData.authorization.remainingLiters)}
                     required
                     value={dispenseLiters}
                     onChange={(e) => setDispenseLiters(parseFloat(e.target.value) || 0)}
-                    className="w-full px-3 py-2 border border-gov-line rounded-lg text-sm font-bold font-mono focus:outline-none focus:border-gov-blue text-gov-ink bg-white"
+                    className="w-full px-3.5 py-2.5 border border-gov-line rounded-xl text-base font-bold font-mono focus:outline-none focus:border-gov-blue text-gov-ink bg-white shadow-2xs"
                   />
-                  <span className="text-[10px] text-gov-muted">
-                    Max allowed: {verifiedData.authorization.remainingLiters} L
-                  </span>
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold text-[#526177] mb-1">
                     Price per Liter
                   </label>
-                  <div className="px-3 py-2 border border-gov-line rounded-lg text-sm font-mono bg-gray-50 text-gov-ink">
+                  <div className="px-3.5 py-2.5 border border-gov-line rounded-xl text-sm font-mono bg-gray-50 text-gov-ink">
                     {verifiedData.authorization.pricePerLiter} ETB
                   </div>
                 </div>
@@ -371,7 +413,7 @@ export const ScannerPage: React.FC = () => {
                   <label className="block text-xs font-semibold text-[#526177] mb-1">
                     Total Charge (ETB)
                   </label>
-                  <div className="px-3 py-2 border border-blue-200 rounded-lg text-sm font-extrabold font-mono bg-blue-50 text-gov-blue">
+                  <div className="px-3.5 py-2.5 border border-blue-200 rounded-xl text-base font-black font-mono bg-blue-50 text-gov-blue">
                     {calculateTotalBirr()} ETB
                   </div>
                 </div>
@@ -385,17 +427,17 @@ export const ScannerPage: React.FC = () => {
                   type="text"
                   value={dispenseNotes}
                   onChange={(e) => setDispenseNotes(e.target.value)}
-                  placeholder="e.g. Dispensed into 4 approved 20L containers"
-                  className="w-full px-3 py-2 border border-gov-line rounded-lg text-xs focus:outline-none focus:border-gov-blue bg-white"
+                  placeholder="e.g. Dispensed into approved containers"
+                  className="w-full px-3.5 py-2.5 border border-gov-line rounded-xl text-xs sm:text-sm focus:outline-none focus:border-gov-blue bg-white"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={dispensing || Number(verifiedData.authorization.remainingLiters) <= 0}
-                className="w-full bg-gov-blue hover:bg-gov-blueHover text-white py-3 rounded-xl font-bold text-xs transition-colors shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white py-3.5 px-4 rounded-xl font-bold text-sm transition-all shadow-md shadow-emerald-600/30 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
               >
-                <Receipt size={16} />
+                <Receipt size={18} />
                 <span>
                   {dispensing ? 'Recording Dispensing...' : 'Confirm Dispensing & Issue Official Receipt'}
                 </span>
