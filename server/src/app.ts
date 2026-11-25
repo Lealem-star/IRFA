@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import path from 'path';
@@ -8,11 +8,11 @@ import { errorHandler } from './middleware/errorHandler.js';
 const app = express();
 
 // Cross-Origin Resource Sharing
-const configuredOrigins = process.env.CLIENT_URL
-  ? process.env.CLIENT_URL.split(',').map((u) => u.trim())
+const configuredOrigins: string[] = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(',').map((u: string) => u.trim())
   : [];
 
-const allowedOrigins = [
+const allowedOrigins: string[] = [
   'http://localhost:5173',
   'http://127.0.0.1:5173',
   ...configuredOrigins,
@@ -20,7 +20,7 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: (origin, callback) => {
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
       // Allow requests with no origin (e.g. mobile apps, curl, server-to-server)
       if (!origin) return callback(null, true);
 
@@ -52,7 +52,7 @@ app.use('/uploads', express.static(uploadsPath, {
 }));
 
 // Base Health Check
-app.get('/api/health', (_req, res) => {
+app.get('/api/health', (_req: Request, res: Response) => {
   res.json({
     status: 'ok',
     system: 'Digital Fuel Coupon System — Bahir Dar City Administration Office of Agriculture',
