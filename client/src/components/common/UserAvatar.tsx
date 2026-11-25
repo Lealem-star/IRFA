@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { User } from '../../types';
+import { getAssetUrl } from '../../services/api';
 
 interface UserAvatarProps {
   user: User;
@@ -10,11 +11,7 @@ interface UserAvatarProps {
 
 export const getAvatarUrl = (path?: string | null): string | null => {
   if (!path) return null;
-  if (path.startsWith('http://') || path.startsWith('https://')) {
-    return path;
-  }
-  // If backend relative path
-  return `http://localhost:5000${path}`;
+  return getAssetUrl(path);
 };
 
 export const getUserInitials = (user: User): string => {

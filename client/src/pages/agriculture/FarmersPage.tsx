@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../../services/api';
+import api, { getAssetUrl } from '../../services/api';
 import { Farmer, Kebele } from '../../types';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { Search, Plus, Upload, Filter, Eye, UserPlus, RefreshCw, X, AlertCircle, Camera, User } from 'lucide-react';
@@ -325,7 +325,7 @@ Getachew Reda,+251 918 883 344,ETH-BD-2024-1012,3.2,Diesel,14 HP,Tomato`
                       <div className="w-7 h-7 rounded-full bg-slate-100 border border-gray-200 overflow-hidden shrink-0 flex items-center justify-center">
                         {farmer.photoUrl ? (
                           <img
-                            src={farmer.photoUrl.startsWith('http') ? farmer.photoUrl : `http://localhost:5000${farmer.photoUrl}`}
+                            src={getAssetUrl(farmer.photoUrl)}
                             alt=""
                             className="w-full h-full object-cover"
                           />

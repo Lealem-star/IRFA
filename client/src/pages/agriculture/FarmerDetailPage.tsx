@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import api from '../../services/api';
+import api, { getAssetUrl } from '../../services/api';
 import { Farmer } from '../../types';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { FarmerDigitalIdCard } from '../../components/cards/FarmerDigitalIdCard';
@@ -205,7 +205,7 @@ export const FarmerDetailPage: React.FC = () => {
             <div className="w-24 h-30 bg-slate-100 border-2 border-slate-200 rounded-xl overflow-hidden shadow-xs flex items-center justify-center relative">
               {farmer.photoUrl ? (
                 <img
-                  src={farmer.photoUrl.startsWith('http') ? farmer.photoUrl : `http://localhost:5000${farmer.photoUrl}`}
+                  src={getAssetUrl(farmer.photoUrl)}
                   alt={farmer.fullName}
                   className="w-full h-full object-cover"
                 />

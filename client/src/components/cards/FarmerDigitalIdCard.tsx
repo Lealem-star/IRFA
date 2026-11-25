@@ -1,6 +1,7 @@
 import React from 'react';
 import { Farmer, FarmerCard } from '../../types';
 import { User, AlertCircle, ShieldCheck } from 'lucide-react';
+import { getAssetUrl } from '../../services/api';
 
 interface FarmerDigitalIdCardProps {
   farmer: Farmer;
@@ -55,11 +56,7 @@ export const FarmerDigitalIdCard: React.FC<FarmerDigitalIdCardProps> = ({
     : '1 Year from Issue';
 
   // Photo URL resolution
-  const photoUrl = farmer.photoUrl
-    ? farmer.photoUrl.startsWith('http')
-      ? farmer.photoUrl
-      : `http://localhost:5000${farmer.photoUrl}`
-    : null;
+  const photoUrl = farmer.photoUrl ? getAssetUrl(farmer.photoUrl) : null;
 
   /* Front Card View */
   const renderFront = () => (
