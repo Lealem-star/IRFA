@@ -10,18 +10,21 @@ import {
   Maximize2,
   ShieldCheck,
   User,
+  ArrowLeft,
 } from 'lucide-react';
 
 interface ScannerAuthorizedViewProps {
   data: VerificationResultData;
   onContinueToDispense: () => void;
   onCancelScan: () => void;
+  onExit?: () => void;
 }
 
 export const ScannerAuthorizedView: React.FC<ScannerAuthorizedViewProps> = ({
   data,
   onContinueToDispense,
   onCancelScan,
+  onExit,
 }) => {
   const { farmer, authorization } = data;
   const photoUrl = farmer.photoUrl ? getAssetUrl(farmer.photoUrl) : null;
@@ -170,6 +173,17 @@ export const ScannerAuthorizedView: React.FC<ScannerAuthorizedViewProps> = ({
           <RotateCcw size={14} />
           <span>Cancel / Scan Another Farmer</span>
         </button>
+
+        {onExit && (
+          <button
+            type="button"
+            onClick={onExit}
+            className="w-full py-2 px-4 text-slate-500 hover:text-slate-800 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer pt-1"
+          >
+            <ArrowLeft size={13} />
+            <span>Exit to Dashboard</span>
+          </button>
+        )}
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ import {
   Calendar,
   User,
   ShieldCheck,
+  ArrowLeft,
 } from 'lucide-react';
 
 interface ScannerReceiptViewProps {
@@ -17,6 +18,7 @@ interface ScannerReceiptViewProps {
   remainingLiters: number;
   operatorUsername?: string;
   onScanNext: () => void;
+  onExit?: () => void;
 }
 
 export const ScannerReceiptView: React.FC<ScannerReceiptViewProps> = ({
@@ -24,6 +26,7 @@ export const ScannerReceiptView: React.FC<ScannerReceiptViewProps> = ({
   remainingLiters,
   operatorUsername,
   onScanNext,
+  onExit,
 }) => {
   const handlePrint = () => {
     printReceiptDocument(
@@ -151,6 +154,17 @@ export const ScannerReceiptView: React.FC<ScannerReceiptViewProps> = ({
           <Printer size={15} />
           <span>Print Official Receipt</span>
         </button>
+
+        {onExit && (
+          <button
+            type="button"
+            onClick={onExit}
+            className="w-full py-2 px-4 text-slate-500 hover:text-slate-800 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer pt-1"
+          >
+            <ArrowLeft size={13} />
+            <span>Return to Dashboard</span>
+          </button>
+        )}
       </div>
     </div>
   );

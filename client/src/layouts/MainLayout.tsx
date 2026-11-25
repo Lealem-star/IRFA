@@ -29,6 +29,18 @@ export const MainLayout: React.FC = () => {
     return <Navigate to="/" replace />;
   }
 
+  // 100% Immersive Mode for QR Scanner Workflow
+  // Reclaims all viewport space: hides Topbar (logo, title, hamburger), Sidebar, BottomNav, and mobile drawers.
+  if (isScanner) {
+    return (
+      <div className="w-full h-[100dvh] min-h-[100dvh] bg-slate-950 text-white overflow-hidden flex flex-col">
+        <main className="w-full h-full flex-1 flex flex-col min-h-0 overflow-y-auto p-0 m-0">
+          <Outlet />
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex bg-gov-bg text-gov-ink font-sans relative">
       {/* Desktop Sidebar (hidden on mobile) */}
@@ -40,13 +52,7 @@ export const MainLayout: React.FC = () => {
           onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
           onOpenProfile={() => setIsProfileOpen(true)}
         />
-        <main
-          className={
-            isScanner
-              ? 'p-0 pb-0 md:p-[26px_30px] md:pb-8 max-w-[1480px] w-full mx-auto min-w-0 flex-1 flex flex-col'
-              : 'p-3 sm:p-5 md:p-[26px_30px] pb-24 md:pb-8 max-w-[1480px] w-full mx-auto min-w-0'
-          }
-        >
+        <main className="p-3 sm:p-5 md:p-[26px_30px] pb-24 md:pb-8 max-w-[1480px] w-full mx-auto min-w-0">
           <Outlet />
         </main>
       </div>

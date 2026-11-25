@@ -118,7 +118,11 @@ export const ScannerPage: React.FC = () => {
   };
 
   return (
-    <div className="w-full flex-1 flex flex-col min-w-0 bg-gov-bg">
+    <div
+      className={`w-full flex-1 flex flex-col min-w-0 ${
+        step === 'SCANNING' ? 'bg-slate-950 h-full' : 'bg-gov-bg min-h-full py-4 sm:py-6 overflow-y-auto'
+      }`}
+    >
       {/* 1. STEP: SCANNING (Camera View) */}
       {step === 'SCANNING' && (
         <ScannerCameraView
@@ -155,6 +159,7 @@ export const ScannerPage: React.FC = () => {
           data={verifiedData}
           onContinueToDispense={() => setStep('DISPENSING')}
           onCancelScan={resetToNextFarmer}
+          onExit={() => navigate('/dashboard')}
         />
       )}
 
@@ -165,6 +170,7 @@ export const ScannerPage: React.FC = () => {
           attemptedCode={attemptedCode}
           onScanAnother={resetToNextFarmer}
           onOpenManualEntry={() => setIsManualModalOpen(true)}
+          onExit={() => navigate('/dashboard')}
         />
       )}
 
@@ -186,6 +192,7 @@ export const ScannerPage: React.FC = () => {
           remainingLiters={remainingAfter}
           operatorUsername={user?.username}
           onScanNext={resetToNextFarmer}
+          onExit={() => navigate('/dashboard')}
         />
       )}
 

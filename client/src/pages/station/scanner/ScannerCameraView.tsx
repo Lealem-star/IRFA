@@ -226,29 +226,29 @@ export const ScannerCameraView: React.FC<ScannerCameraViewProps> = ({
   }, [startCamera]);
 
   return (
-    <div className="relative w-full h-[calc(100dvh-56px)] md:h-[680px] bg-slate-950 text-white flex flex-col justify-between overflow-hidden select-none">
-      {/* Top Operational Action Bar */}
-      <div className="relative z-20 flex items-center justify-between px-3.5 py-2.5 bg-gradient-to-b from-black/80 via-black/40 to-transparent">
+    <div className="relative w-full h-[100dvh] min-h-[100dvh] bg-slate-950 text-white flex flex-col justify-between overflow-hidden select-none">
+      {/* Top Operational Action Bar (Immersive Overlay) */}
+      <div className="relative z-20 flex items-center justify-between px-3.5 py-2.5 pt-[max(0.65rem,env(safe-area-inset-top))] bg-gradient-to-b from-black/85 via-black/45 to-transparent">
         {/* Exit / Back button */}
         <button
           type="button"
           onClick={onExit}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 text-xs font-semibold backdrop-blur-md transition-all cursor-pointer"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 text-xs font-semibold backdrop-blur-md transition-all cursor-pointer shrink-0"
         >
           <ArrowLeft size={15} />
           <span>Exit</span>
         </button>
 
         {/* Station Name & Badge */}
-        <div className="text-center px-2 min-w-0">
-          <div className="text-xs font-bold text-white truncate max-w-[200px] sm:max-w-xs leading-tight">
+        <div className="text-center px-2 min-w-0 flex-1 max-w-[200px] sm:max-w-xs mx-auto">
+          <div className="text-xs font-bold text-white truncate leading-tight">
             {stationName}
           </div>
           <div className="text-[10px] text-blue-300 font-mono tracking-wider">{stationCode}</div>
         </div>
 
         {/* Hardware Controls (Torch & Camera Switch) */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 shrink-0">
           {hasTorch && status === 'SCANNING' && (
             <button
               type="button"
@@ -256,7 +256,7 @@ export const ScannerCameraView: React.FC<ScannerCameraViewProps> = ({
               className={`p-2 rounded-full backdrop-blur-md transition-all cursor-pointer ${
                 isTorchOn
                   ? 'bg-amber-400 text-slate-950 shadow-md shadow-amber-400/40'
-                  : 'bg-white/10 text-white hover:bg-white/20'
+                  : 'bg-white/15 text-white hover:bg-white/25'
               }`}
               title={isTorchOn ? 'Turn Flashlight Off' : 'Turn Flashlight On'}
             >
@@ -268,7 +268,7 @@ export const ScannerCameraView: React.FC<ScannerCameraViewProps> = ({
             <button
               type="button"
               onClick={handleSwitchCamera}
-              className="p-2 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 text-white backdrop-blur-md transition-all cursor-pointer"
+              className="p-2 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 text-white backdrop-blur-md transition-all cursor-pointer"
               title="Switch Camera"
             >
               <SwitchCamera size={16} />
@@ -314,9 +314,9 @@ export const ScannerCameraView: React.FC<ScannerCameraViewProps> = ({
               <div className="absolute inset-x-2 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_12px_rgba(52,211,153,0.9)] animate-pulse" />
             </div>
 
-            {/* Subtle instruction banner */}
+            {/* Minimal instruction */}
             <div className="mt-6 bg-black/60 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 text-xs font-semibold text-slate-200 shadow-md">
-              Align Farmer QR Card within frame
+              Align farmer QR card within frame
             </div>
           </div>
         )}
@@ -359,12 +359,12 @@ export const ScannerCameraView: React.FC<ScannerCameraViewProps> = ({
       </div>
 
       {/* Bottom Secondary Actions Bar */}
-      <div className="relative z-20 px-4 py-3 bg-gradient-to-t from-black/90 via-black/60 to-transparent flex items-center justify-between gap-2">
+      <div className="relative z-20 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-gradient-to-t from-black/90 via-black/60 to-transparent flex items-center justify-between gap-3">
         {/* Demo Mode Button */}
         <button
           type="button"
           onClick={onOpenDemoMenu}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 active:scale-95 text-white text-xs font-semibold backdrop-blur-md transition-all cursor-pointer border border-white/10"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 active:scale-95 text-white text-xs font-semibold backdrop-blur-md transition-all cursor-pointer border border-white/10"
         >
           <Sparkles size={14} className="text-amber-400" />
           <span>Demo Shortcuts</span>

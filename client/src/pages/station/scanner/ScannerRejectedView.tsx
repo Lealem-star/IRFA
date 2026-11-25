@@ -5,6 +5,7 @@ import {
   Search,
   ShieldAlert,
   HelpCircle,
+  ArrowLeft,
 } from 'lucide-react';
 
 interface ScannerRejectedViewProps {
@@ -12,6 +13,7 @@ interface ScannerRejectedViewProps {
   attemptedCode?: string;
   onScanAnother: () => void;
   onOpenManualEntry: () => void;
+  onExit?: () => void;
 }
 
 export const ScannerRejectedView: React.FC<ScannerRejectedViewProps> = ({
@@ -19,6 +21,7 @@ export const ScannerRejectedView: React.FC<ScannerRejectedViewProps> = ({
   attemptedCode,
   onScanAnother,
   onOpenManualEntry,
+  onExit,
 }) => {
   return (
     <div className="w-full max-w-md mx-auto p-4 sm:p-6 space-y-4 animate-fade-in">
@@ -88,6 +91,17 @@ export const ScannerRejectedView: React.FC<ScannerRejectedViewProps> = ({
           <Search size={15} />
           <span>Enter ID Manually</span>
         </button>
+
+        {onExit && (
+          <button
+            type="button"
+            onClick={onExit}
+            className="w-full py-2 px-4 text-slate-500 hover:text-slate-800 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer pt-1"
+          >
+            <ArrowLeft size={13} />
+            <span>Exit to Dashboard</span>
+          </button>
+        )}
       </div>
     </div>
   );

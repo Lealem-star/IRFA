@@ -73,45 +73,81 @@ export const DashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Page Heading */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex justify-between items-center gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gov-ink mb-1">
-            Dashboard
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gov-ink">
+            {user?.role === 'STATION_ADMIN' ? 'Station Overview' : 'Dashboard'}
           </h1>
-          <p className="text-xs text-gov-muted">
-            {user?.role === 'AGRICULTURE_OFFICE'
-              ? 'Manage irrigation farmers, monthly fuel allocations and office requests'
-              : user?.role === 'TRADE_OFFICE'
-              ? 'Authorize fuel quotas, assign stations and monitor regional distribution'
-              : user?.role === 'STATION_ADMIN'
-              ? `Operational fuel dispensing portal for ${user.fuelStation?.name || 'Assigned Station'}`
-              : 'System health, user access control and technical audit trail'}
-          </p>
+          {user?.role === 'STATION_ADMIN' ? (
+            <p className="text-[11px] sm:text-xs text-gov-muted mt-0.5 hidden sm:block">
+              {user.fuelStation?.name || 'Assigned Fuel Station'}
+            </p>
+          ) : (
+            <p className="text-xs text-gov-muted mt-0.5">
+              {user?.role === 'AGRICULTURE_OFFICE'
+                ? 'Manage irrigation farmers, monthly fuel allocations and office requests'
+                : user?.role === 'TRADE_OFFICE'
+                ? 'Authorize fuel quotas, assign stations and monitor regional distribution'
+                : 'System health, user access control and technical audit trail'}
+            </p>
+          )}
         </div>
 
         <button
           onClick={fetchStats}
-          className="border border-gov-line bg-white hover:bg-gray-50 text-gov-ink text-xs font-semibold px-3 py-2 rounded-[8px] transition-colors flex items-center gap-1.5 shadow-sm"
+          disabled={loading}
+          className="border border-gov-line bg-white hover:bg-gray-50 text-gov-ink text-xs font-semibold px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer shrink-0"
         >
-          <RefreshCw size={13} className="text-gov-muted" />
-          <span>Refresh</span>
+          <RefreshCw size={13} className={`text-gov-muted ${loading ? 'animate-spin' : ''}`} />
+          <span className="text-[11px] sm:text-xs">Refresh</span>
         </button>
       </div>
 
-      {/* 4 Stat Cards Grid matching Prototype */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-        {data?.stats?.map((stat: any, index: number) => (
-          <StatCard
-            key={index}
-            title={stat.label}
-            value={stat.value}
-            note={stat.note}
-            icon={getStatIcon(stat.icon)}
-          />
-        ))}
-      </div>
+      {/* 4 Stat Cards Grid */}
+      {user?.role === 'STATION_ADMIN' ? (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3.5">
+          {data?.stats?.map((stat: any, index: number) => {
+            let cleanLabel = stat.label;
+            if (/transaction/i.test(stat.label)) cleanLabel = 'Transactions';
+            else if (/dispensed/i.test(stat.label)) cleanLabel = 'Fuel Dispensed';
+            else if (/valid/i.test(stat.label)) cleanLabel = 'Valid Farmers';
+            else if (/blocked/i.test(stat.label)) cleanLabel = 'Blocked Scans';
+
+            return (
+              <div
+                key={index}
+                className="bg-white border border-gov-line rounded-xl p-3 sm:p-4 shadow-xs flex flex-col justify-between"
+              >
+                <div className="flex items-center justify-between gap-1 text-gov-muted">
+                  <span className="text-[11px] sm:text-xs font-semibold text-slate-600 truncate">
+                    {cleanLabel}
+                  </span>
+                  <span className="text-gov-blue p-1 sm:p-1.5 rounded-lg bg-blue-50/80 flex items-center justify-center shrink-0">
+                    {getStatIcon(stat.icon)}
+                  </span>
+                </div>
+                <div className="text-xl sm:text-2xl font-black text-gov-ink tracking-tight mt-1.5 sm:mt-2">
+                  {stat.value}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          {data?.stats?.map((stat: any, index: number) => (
+            <StatCard
+              key={index}
+              title={stat.label}
+              value={stat.value}
+              note={stat.note}
+              icon={getStatIcon(stat.icon)}
+            />
+          ))}
+        </div>
+      )}
 
       {/* ROLE 1: AGRICULTURE OFFICE DASHBOARD */}
       {user?.role === 'AGRICULTURE_OFFICE' && (
@@ -340,73 +376,68 @@ export const DashboardPage: React.FC = () => {
 
       {/* ROLE 3: FUEL STATION OPERATOR DASHBOARD */}
       {user?.role === 'STATION_ADMIN' && (
-        <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-4">
-          <div className="bg-white border border-gov-line rounded-[13px] overflow-hidden shadow-sm p-6 text-center flex flex-col items-center justify-center">
-            <div className="border-2 border-dashed border-[#d4deee] bg-[#fafcff] rounded-[14px] p-8 w-full max-w-[450px]">
-              <div className="text-4xl mb-3">▦</div>
-              <h3 className="text-base font-bold text-gov-ink mb-1">Scan Farmer QR Card</h3>
-              <p className="text-xs text-gov-muted max-w-[340px] mx-auto mb-6">
-                Verify farmer registration, Trade authorization, station assignment, fuel type and remaining allocation in real time.
-              </p>
-              <button
-                onClick={() => navigate('/scanner')}
-                className="bg-gov-blue hover:bg-gov-blueHover text-white px-6 py-2.5 rounded-[9px] font-semibold text-xs transition-colors shadow-sm inline-flex items-center gap-2"
-              >
-                <ScanLine size={16} />
-                <span>Open Verification Scanner</span>
-              </button>
-            </div>
-          </div>
-
-          <div className="bg-white border border-gov-line rounded-[13px] overflow-hidden shadow-sm">
-            <div className="p-[16px_18px] border-b border-gov-line flex justify-between items-center">
+        <div className="bg-white border border-gov-line rounded-xl overflow-hidden shadow-xs">
+          <div className="p-3.5 sm:p-[16px_18px] border-b border-gov-line flex justify-between items-center">
+            <div>
               <h3 className="text-sm font-bold text-gov-ink m-0">Recent Fuel Transactions</h3>
-              <button
-                onClick={() => navigate('/transactions')}
-                className="text-xs text-gov-blue hover:underline font-semibold"
-              >
-                View all →
-              </button>
+              <p className="text-[11px] text-gov-muted hidden sm:block mt-0.5">
+                Live ledger of completed fuel dispensing events
+              </p>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="border-b border-gov-line bg-gray-50/50">
-                    <th className="p-3 text-[10px] font-bold text-gov-muted uppercase tracking-wider">
-                      Farmer
-                    </th>
-                    <th className="p-3 text-[10px] font-bold text-gov-muted uppercase tracking-wider">
-                      Fuel
-                    </th>
-                    <th className="p-3 text-[10px] font-bold text-gov-muted uppercase tracking-wider">
-                      Volume
-                    </th>
-                    <th className="p-3 text-[10px] font-bold text-gov-muted uppercase tracking-wider">
-                      Status
-                    </th>
+            <button
+              onClick={() => navigate('/transactions')}
+              className="text-xs text-gov-blue hover:underline font-semibold flex items-center gap-1 cursor-pointer"
+            >
+              <span>View all</span>
+              <span className="hidden sm:inline">transactions</span>
+              <span>→</span>
+            </button>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs min-w-[320px]">
+              <thead>
+                <tr className="border-b border-gov-line bg-gray-50/60">
+                  <th className="p-2.5 sm:p-3 text-[10px] font-bold text-gov-muted uppercase tracking-wider">
+                    Farmer
+                  </th>
+                  <th className="p-2.5 sm:p-3 text-[10px] font-bold text-gov-muted uppercase tracking-wider">
+                    Fuel
+                  </th>
+                  <th className="p-2.5 sm:p-3 text-[10px] font-bold text-gov-muted uppercase tracking-wider">
+                    Volume
+                  </th>
+                  <th className="p-2.5 sm:p-3 text-[10px] font-bold text-gov-muted uppercase tracking-wider text-right">
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {data?.recentTransactions?.map((tx: any) => (
+                  <tr key={tx.id} className="hover:bg-gray-50/60 transition-colors">
+                    <td className="p-2.5 sm:p-3 font-semibold text-gov-ink">
+                      <div>{tx.farmer?.fullName || 'Farmer'}</div>
+                      <div className="text-[10px] font-mono text-gov-muted sm:hidden">
+                        {tx.farmer?.farmerCode}
+                      </div>
+                    </td>
+                    <td className="p-2.5 sm:p-3 text-gov-muted">{tx.fuelType?.name || 'Diesel'}</td>
+                    <td className="p-2.5 sm:p-3 font-bold text-gov-ink whitespace-nowrap">
+                      {tx.quantityLiters} L
+                    </td>
+                    <td className="p-2.5 sm:p-3 text-right">
+                      <StatusBadge status="RECORDED" />
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {data?.recentTransactions?.map((tx: any) => (
-                    <tr key={tx.id} className="hover:bg-gray-50/60 transition-colors">
-                      <td className="p-3 font-semibold text-gov-ink">{tx.farmer?.fullName}</td>
-                      <td className="p-3 text-gov-muted">{tx.fuelType?.name}</td>
-                      <td className="p-3 font-bold text-gov-ink">{tx.quantityLiters} L</td>
-                      <td className="p-3">
-                        <StatusBadge status="RECORDED" />
-                      </td>
-                    </tr>
-                  ))}
-                  {(!data?.recentTransactions || data.recentTransactions.length === 0) && (
-                    <tr>
-                      <td colSpan={4} className="p-6 text-center text-gov-muted text-xs">
-                        No transactions recorded yet today.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                ))}
+                {(!data?.recentTransactions || data.recentTransactions.length === 0) && (
+                  <tr>
+                    <td colSpan={4} className="p-6 text-center text-gov-muted text-xs">
+                      No transactions recorded yet today.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
