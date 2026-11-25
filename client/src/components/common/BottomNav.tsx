@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
   LayoutDashboard,
@@ -26,11 +26,15 @@ interface BottomNavProps {
 
 export const BottomNav: React.FC<BottomNavProps> = ({ onOpenMore, onOpenProfile }) => {
   const { user } = useAuth();
+  const location = useLocation();
 
   if (!user) return null;
 
   // Station Admin - Mobile First Experience
   if (user.role === 'STATION_ADMIN') {
+    // Hide bottom nav on scanner flow to provide an unobstructed, focused operational screen
+    if (location.pathname === '/scanner') return null;
+
     return (
       <nav
         aria-label="Mobile Navigation"

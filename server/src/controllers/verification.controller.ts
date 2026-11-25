@@ -173,6 +173,7 @@ export const verifyFarmerForDispensing = async (req: AuthenticatedRequest, res: 
           farmerCode: farmer.farmerCode,
           fullName: farmer.fullName,
           phone: farmer.phone,
+          photoUrl: farmer.photoUrl,
           kebele: farmer.kebele.name,
           subCity: farmer.kebele.location.name,
           landSize: farmer.irrigationProfile?.landSizeHectares,

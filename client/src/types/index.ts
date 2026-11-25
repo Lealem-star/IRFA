@@ -229,6 +229,7 @@ export interface VerificationResultData {
     farmerCode: string;
     fullName: string;
     phone: string;
+    photoUrl?: string | null;
     kebele: string;
     subCity: string;
     landSize: number | string;
