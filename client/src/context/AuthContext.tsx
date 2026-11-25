@@ -72,7 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.removeItem('irfa_user');
       setUser(null);
       setToken(null);
-      window.location.href = '/login';
+      window.location.href = '/';
     }
   };
 

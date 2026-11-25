@@ -80,6 +80,11 @@ export const UsersPage: React.FC = () => {
     e.preventDefault();
     if (!selectedUser) return;
 
+    if (!newPassword || newPassword.length < 6) {
+      setModalError('New password must be at least 6 characters long.');
+      return;
+    }
+
     setFormLoading(true);
     setModalError(null);
 
@@ -91,7 +96,7 @@ export const UsersPage: React.FC = () => {
       if (res.data.success) {
         setShowResetModal(false);
         setNewPassword('');
-        alert('Password reset successfully!');
+        alert(`Password for "${selectedUser.username}" has been updated successfully!`);
       }
     } catch (err: any) {
       setModalError(err.response?.data?.message || 'Failed to reset password');
@@ -319,10 +324,23 @@ export const UsersPage: React.FC = () => {
           <div className="bg-white rounded-2xl max-w-sm w-full border border-gov-line shadow-2xl overflow-hidden">
             <div className="p-4 border-b border-gov-line flex justify-between items-center bg-gray-50/50">
               <h3 className="text-xs font-bold text-gov-ink m-0">Reset Password: {selectedUser.username}</h3>
-              <button onClick={() => setShowResetModal(false)} className="text-gov-muted hover:text-gov-ink">
+              <button
+                onClick={() => {
+                  setShowResetModal(false);
+                  setModalError(null);
+                }}
+                className="text-gov-muted hover:text-gov-ink"
+              >
                 <X size={18} />
               </button>
             </div>
+
+            {modalError && (
+              <div className="m-4 mb-0 bg-red-50 border border-red-200 text-red-700 p-2.5 rounded-lg text-xs flex items-center gap-2">
+                <AlertCircle size={14} className="shrink-0" />
+                <span>{modalError}</span>
+              </div>
+            )}
 
             <form onSubmit={handleResetPassword} className="p-5 space-y-3 text-xs">
               <div>
@@ -330,17 +348,22 @@ export const UsersPage: React.FC = () => {
                 <input
                   type="password"
                   required
+                  minLength={6}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Enter new password"
+                  placeholder="Enter new password (min. 6 chars)"
                   className="w-full px-3 py-2 border border-gov-line rounded-lg text-xs bg-white focus:outline-none"
                 />
+                <p className="mt-1 text-[11px] text-gov-muted">Must be at least 6 characters long.</p>
               </div>
 
               <div className="pt-2 flex justify-end gap-2 border-t border-gov-line">
                 <button
                   type="button"
-                  onClick={() => setShowResetModal(false)}
+                  onClick={() => {
+                    setShowResetModal(false);
+                    setModalError(null);
+                  }}
                   className="px-4 py-2 border border-gov-line rounded-lg text-xs font-semibold text-gov-ink hover:bg-gray-50"
                 >
                   Cancel

@@ -40,7 +40,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && window.location.pathname !== '/login' && window.location.pathname !== '/') {
       localStorage.removeItem('irfa_token');
       localStorage.removeItem('irfa_user');
-      window.location.href = '/login';
+      window.location.href = '/';
     }
     return Promise.reject(error);
   }
