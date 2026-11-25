@@ -51,7 +51,8 @@ export const verifyFarmerForDispensing = async (req: AuthenticatedRequest, res: 
       include: {
         farmer: {
           include: {
-            kebele: { include: { location: true } },
+            subCity: true,
+            kebele: { include: { location: true, subCity: true } },
             irrigationProfile: true,
           },
         },
@@ -175,7 +176,7 @@ export const verifyFarmerForDispensing = async (req: AuthenticatedRequest, res: 
           phone: farmer.phone,
           photoUrl: farmer.photoUrl,
           kebele: farmer.kebele.name,
-          subCity: farmer.kebele.location.name,
+          subCity: farmer.subCity?.name || farmer.kebele.subCity?.name || farmer.kebele.location?.name || 'Bahir Dar',
           landSize: farmer.irrigationProfile?.landSizeHectares,
           waterSource: farmer.irrigationProfile?.waterSource,
           pumpFuelType: farmer.irrigationProfile?.pumpFuelType,

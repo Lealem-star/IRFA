@@ -15,7 +15,7 @@ const generateFarmerCode = async (): Promise<string> => {
 
 export const listFarmers = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    const { search, kebeleId, eligibilityStatus, fuelType, page = '1', limit = '15' } = req.query;
+    const { search, kebeleId, subCityId, eligibilityStatus, fuelType, page = '1', limit = '15' } = req.query;
 
     const skip = (parseInt(page as string) - 1) * parseInt(limit as string);
     const take = parseInt(limit as string);
@@ -29,6 +29,10 @@ export const listFarmers = async (req: AuthenticatedRequest, res: Response): Pro
         { phone: { contains: search as string } },
         { nationalId: { contains: search as string } },
       ];
+    }
+
+    if (subCityId) {
+      where.subCityId = subCityId as string;
     }
 
     if (kebeleId) {
@@ -52,8 +56,9 @@ export const listFarmers = async (req: AuthenticatedRequest, res: Response): Pro
         skip,
         take,
         include: {
+          subCity: true,
           kebele: {
-            include: { location: true },
+            include: { location: true, subCity: true },
           },
           irrigationProfile: true,
           cards: {
@@ -94,8 +99,9 @@ export const getFarmerById = async (req: AuthenticatedRequest, res: Response): P
         OR: [{ id }, { farmerCode: id }],
       },
       include: {
+        subCity: true,
         kebele: {
-          include: { location: true },
+          include: { location: true, subCity: true },
         },
         irrigationProfile: true,
         cards: {
@@ -140,6 +146,33 @@ export const createFarmer = async (req: AuthenticatedRequest, res: Response): Pr
   try {
     const data = createFarmerSchema.parse(req.body);
 
+    // Verify Kebele exists and strictly belongs to the selected Sub-City
+    const kebele = await prisma.kebele.findUnique({
+      where: { id: data.kebeleId },
+      include: { subCity: true },
+    });
+
+    if (!kebele) {
+      res.status(400).json({ success: false, message: 'Invalid Kebele selected / የተመረጠው ቀበሌ አልተገኘም' });
+      return;
+    }
+
+    if (kebele.subCityId && data.subCityId && kebele.subCityId !== data.subCityId) {
+      res.status(400).json({
+        success: false,
+        message: 'Validation Error: Selected Kebele does not belong to the selected Sub-City / የተመረጠው ቀበሌ ከተመረጠው ክፍለ ከተማ ጋር አይዛመድም',
+      });
+      return;
+    }
+
+    const normalizedGender =
+      data.gender === 'Female' || data.gender === 'FEMALE' || data.gender === 'ሴት' ? 'ሴት' : 'ወንድ';
+
+    const normalizedFuelType =
+      data.pumpFuelType === 'Benzene' || data.pumpFuelType === 'ቤንዚል' || data.pumpFuelType === 'ቤንዚን'
+        ? 'Benzene'
+        : 'Diesel';
+
     const photoUrl = req.file ? `/uploads/farmers/${req.file.filename}` : data.photoUrl || null;
     const farmerCode = await generateFarmerCode();
     const cardSerialNumber = `BD-CARD-${new Date().getFullYear()}-${farmerCode.replace('FR-', '')}`;
@@ -149,10 +182,13 @@ export const createFarmer = async (req: AuthenticatedRequest, res: Response): Pr
       data: {
         farmerCode,
         fullName: data.fullName,
+        gender: normalizedGender,
         phone: data.phone,
         nationalId: data.nationalId || null,
         photoUrl,
+        subCityId: data.subCityId,
         kebeleId: data.kebeleId,
+        declaredFuelLiters: data.declaredFuelLiters,
         eligibilityStatus: EligibilityStatus.ELIGIBLE,
         isActive: true,
         irrigationProfile: {
@@ -160,10 +196,11 @@ export const createFarmer = async (req: AuthenticatedRequest, res: Response): Pr
             landSizeHectares: data.landSizeHectares,
             waterSource: data.waterSource as WaterSource,
             waterSourceDetail: data.waterSourceDetail || null,
-            pumpFuelType: data.pumpFuelType,
+            pumpFuelType: normalizedFuelType,
             pumpHorsepower: data.pumpHorsepower || null,
             pumpModel: data.pumpModel || null,
-            primaryCrops: data.primaryCrops || null,
+            primaryCrops: data.primaryCrops,
+            declaredFuelLiters: data.declaredFuelLiters,
             irrigationSeason: data.irrigationSeason || 'Bega / Dry Season 2026',
           },
         },
@@ -177,7 +214,10 @@ export const createFarmer = async (req: AuthenticatedRequest, res: Response): Pr
         },
       },
       include: {
-        kebele: true,
+        subCity: true,
+        kebele: {
+          include: { location: true, subCity: true },
+        },
         irrigationProfile: true,
         cards: true,
       },
@@ -188,7 +228,7 @@ export const createFarmer = async (req: AuthenticatedRequest, res: Response): Pr
       action: 'CREATE_FARMER',
       entityType: 'Farmer',
       entityId: newFarmer.id,
-      details: { farmerCode, fullName: data.fullName },
+      details: { farmerCode, fullName: data.fullName, subCityId: data.subCityId, kebeleId: data.kebeleId },
       ipAddress: req.ip,
     });
 
@@ -197,7 +237,12 @@ export const createFarmer = async (req: AuthenticatedRequest, res: Response): Pr
       message: 'Farmer registered successfully',
       farmer: newFarmer,
     });
-  } catch (error) {
+  } catch (error: any) {
+    console.error('Farmer registration error:', error);
+    if (error.errors) {
+      res.status(400).json({ success: false, message: error.errors[0]?.message || 'Validation failed', errors: error.errors });
+      return;
+    }
     res.status(500).json({ success: false, message: 'Failed to register farmer', error });
   }
 };
@@ -239,20 +284,46 @@ export const updateFarmer = async (req: AuthenticatedRequest, res: Response): Pr
         });
       }
 
+      // If kebeleId is provided, check if it belongs to subCity
+      const effectiveKebeleId = data.kebeleId || existing.kebeleId;
+      const effectiveSubCityId = data.subCityId || existing.subCityId;
+
+      if (data.kebeleId) {
+        const kb = await tx.kebele.findUnique({ where: { id: data.kebeleId } });
+        if (kb?.subCityId && effectiveSubCityId && kb.subCityId !== effectiveSubCityId) {
+          throw new Error('Selected Kebele does not belong to the selected Sub-City');
+        }
+      }
+
       const photoUrl = req.file
         ? `/uploads/farmers/${req.file.filename}`
         : data.photoUrl !== undefined
         ? data.photoUrl
         : existing.photoUrl;
 
+      const normalizedGender = data.gender
+        ? data.gender === 'Female' || data.gender === 'FEMALE' || data.gender === 'ሴት'
+          ? 'ሴት'
+          : 'ወንድ'
+        : existing.gender;
+
+      const normalizedFuelType = data.pumpFuelType
+        ? data.pumpFuelType === 'Benzene' || data.pumpFuelType === 'ቤንዚል' || data.pumpFuelType === 'ቤንዚን'
+          ? 'Benzene'
+          : 'Diesel'
+        : undefined;
+
       return tx.farmer.update({
         where: { id },
         data: {
           fullName: data.fullName,
+          gender: normalizedGender,
           phone: data.phone,
           nationalId: data.nationalId,
           photoUrl,
-          kebeleId: data.kebeleId,
+          subCityId: data.subCityId || existing.subCityId,
+          kebeleId: data.kebeleId || existing.kebeleId,
+          declaredFuelLiters: data.declaredFuelLiters !== undefined ? data.declaredFuelLiters : existing.declaredFuelLiters,
           eligibilityStatus: data.eligibilityStatus as EligibilityStatus,
           isActive: data.isActive !== undefined ? data.isActive : existing.isActive,
           suspensionReason: data.suspensionReason,
@@ -262,27 +333,32 @@ export const updateFarmer = async (req: AuthenticatedRequest, res: Response): Pr
                 landSizeHectares: data.landSizeHectares || 1.0,
                 waterSource: (data.waterSource as WaterSource) || WaterSource.LAKE_TANA,
                 waterSourceDetail: data.waterSourceDetail,
-                pumpFuelType: data.pumpFuelType || 'Diesel',
+                pumpFuelType: normalizedFuelType || 'Diesel',
                 pumpHorsepower: data.pumpHorsepower,
                 pumpModel: data.pumpModel,
                 primaryCrops: data.primaryCrops,
+                declaredFuelLiters: data.declaredFuelLiters,
                 irrigationSeason: data.irrigationSeason,
               },
               update: {
                 landSizeHectares: data.landSizeHectares,
                 waterSource: data.waterSource as WaterSource,
                 waterSourceDetail: data.waterSourceDetail,
-                pumpFuelType: data.pumpFuelType,
+                pumpFuelType: normalizedFuelType,
                 pumpHorsepower: data.pumpHorsepower,
                 pumpModel: data.pumpModel,
                 primaryCrops: data.primaryCrops,
+                declaredFuelLiters: data.declaredFuelLiters,
                 irrigationSeason: data.irrigationSeason,
               },
             },
           },
         },
         include: {
-          kebele: true,
+          subCity: true,
+          kebele: {
+            include: { location: true, subCity: true },
+          },
           irrigationProfile: true,
           cards: true,
         },

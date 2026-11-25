@@ -154,16 +154,32 @@ model Location {
   @@map("locations")
 }
 
+model SubCity {
+  id          String    @id @default(uuid())
+  code        String    @unique
+  name        String    @unique
+  nameAmharic String?
+  kebeles     Kebele[]
+  farmers     Farmer[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("sub_cities")
+}
+
 model Kebele {
   id         String    @id @default(uuid())
   name       String
   code       String    @unique
-  locationId String
-  location   Location  @relation(fields: [locationId], references: [id])
+  subCityId  String?
+  subCity    SubCity?  @relation(fields: [subCityId], references: [id])
+  locationId String?
+  location   Location? @relation(fields: [locationId], references: [id])
   farmers    Farmer[]
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
+  @@index([subCityId])
   @@map("kebeles")
 }
 
@@ -186,46 +202,52 @@ model FuelType {
 }
 
 model Farmer {
-  id                String                   @id @default(uuid())
-  farmerCode        String                   @unique
-  fullName          String
-  phone             String
-  nationalId        String?                  @unique
-  photoUrl          String?
-  kebeleId          String
-  kebele            Kebele                   @relation(fields: [kebeleId], references: [id])
-  eligibilityStatus EligibilityStatus        @default(ELIGIBLE)
-  isActive          Boolean                  @default(true)
-  suspensionReason  String?
-  irrigationProfile FarmerIrrigationProfile?
-  cards             FarmerCard[]
-  allocations       MonthlyAllocation[]
-  requestItems      FuelRequestItem[]
-  authorizations    FuelAuthorization[]
-  transactions      FuelTransaction[]
-  verificationLogs  VerificationLog[]
-  createdAt         DateTime                 @default(now())
-  updatedAt         DateTime                 @updatedAt
+  id                 String                   @id @default(uuid())
+  farmerCode         String                   @unique
+  fullName           String
+  gender             String?
+  phone              String
+  nationalId         String?                  @unique
+  photoUrl           String?
+  subCityId          String?
+  subCity            SubCity?                 @relation(fields: [subCityId], references: [id])
+  kebeleId           String
+  kebele             Kebele                   @relation(fields: [kebeleId], references: [id])
+  declaredFuelLiters Decimal?                 @db.Decimal(10, 2)
+  eligibilityStatus  EligibilityStatus        @default(ELIGIBLE)
+  isActive           Boolean                  @default(true)
+  suspensionReason   String?
+  irrigationProfile  FarmerIrrigationProfile?
+  cards              FarmerCard[]
+  allocations        MonthlyAllocation[]
+  requestItems       FuelRequestItem[]
+  authorizations     FuelAuthorization[]
+  transactions       FuelTransaction[]
+  verificationLogs   VerificationLog[]
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
 
   @@index([farmerCode])
   @@index([eligibilityStatus])
+  @@index([subCityId])
   @@map("farmers")
 }
 
 model FarmerIrrigationProfile {
-  id                String       @id @default(uuid())
-  farmerId          String       @unique
-  farmer            Farmer       @relation(fields: [farmerId], references: [id], onDelete: Cascade)
-  landSizeHectares  Decimal      @db.Decimal(8, 2)
-  waterSource       WaterSource  @default(LAKE_TANA)
-  waterSourceDetail String?
-  pumpFuelType      String
-  pumpHorsepower    String?
-  pumpModel         String?
-  primaryCrops      String?
-  irrigationSeason  String?
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
+  id                 String       @id @default(uuid())
+  farmerId           String       @unique
+  farmer             Farmer       @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+  landSizeHectares   Decimal      @db.Decimal(8, 2)
+  waterSource        WaterSource  @default(LAKE_TANA)
+  waterSourceDetail  String?
+  pumpFuelType       String
+  pumpHorsepower     String?
+  pumpModel          String?
+  primaryCrops       String?
+  declaredFuelLiters Decimal?     @db.Decimal(10, 2)
+  irrigationSeason   String?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
 
   @@map("farmer_irrigation_profiles")
 }

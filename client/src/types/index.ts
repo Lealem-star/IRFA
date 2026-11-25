@@ -39,11 +39,21 @@ export interface User {
   } | null;
 }
 
+export interface SubCity {
+  id: string;
+  code: string;
+  name: string;
+  nameAmharic?: string | null;
+  kebeles?: Kebele[];
+}
+
 export interface Kebele {
   id: string;
   name: string;
   code: string;
-  locationId: string;
+  subCityId?: string | null;
+  subCity?: SubCity;
+  locationId?: string | null;
   location?: {
     id: string;
     name: string;
@@ -85,6 +95,7 @@ export interface FarmerIrrigationProfile {
   pumpHorsepower?: string | null;
   pumpModel?: string | null;
   primaryCrops?: string | null;
+  declaredFuelLiters?: number | string | null;
   irrigationSeason?: string | null;
 }
 
@@ -103,11 +114,15 @@ export interface Farmer {
   id: string;
   farmerCode: string;
   fullName: string;
+  gender?: string | null;
   phone: string;
   nationalId?: string | null;
   photoUrl?: string | null;
+  subCityId?: string | null;
+  subCity?: SubCity;
   kebeleId: string;
   kebele: Kebele;
+  declaredFuelLiters?: number | string | null;
   eligibilityStatus: EligibilityStatus;
   isActive: boolean;
   suspensionReason?: string | null;

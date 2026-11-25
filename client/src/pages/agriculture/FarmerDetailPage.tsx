@@ -252,11 +252,20 @@ export const FarmerDetailPage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <MapPin size={14} className="text-gov-muted" />
                 <span>
-                  {farmer.kebele?.name}, {farmer.kebele?.location?.name}
+                  {farmer.kebele?.name}, {farmer.subCity?.name || farmer.kebele?.subCity?.name || farmer.kebele?.location?.name || 'ባሕር ዳር'}
                 </span>
               </div>
               <div>
+                <span className="font-semibold text-gov-ink">Gender (ጾታ):</span> {farmer.gender || 'ወንድ'}
+              </div>
+              <div>
                 <span className="font-semibold text-gov-ink">National ID:</span> {farmer.nationalId || 'N/A'}
+              </div>
+              <div>
+                <span className="font-semibold text-gov-ink">Declared Fuel:</span>{' '}
+                <span className="font-mono font-bold text-gov-blue">
+                  {farmer.declaredFuelLiters || farmer.irrigationProfile?.declaredFuelLiters || '—'} L
+                </span>
               </div>
               <div>
                 <span className="font-semibold text-gov-ink">Registered:</span>{' '}

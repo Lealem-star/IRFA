@@ -25,10 +25,28 @@ router.post('/auth/change-password', authenticateJWT, authCtrl.changePassword);
 // ==================== DASHBOARD ====================
 router.get('/dashboard/stats', authenticateJWT, dashCtrl.getDashboardStats);
 
-// ==================== METADATA HELPERS (Kebeles, FuelTypes, Stations) ====================
-router.get('/meta/kebeles', authenticateJWT, async (_req, res) => {
+// ==================== METADATA HELPERS (SubCities, Kebeles, FuelTypes, Stations) ====================
+router.get('/meta/sub-cities', authenticateJWT, async (_req, res) => {
+  const subCities = await prisma.subCity.findMany({
+    include: {
+      kebeles: {
+        orderBy: { name: 'asc' },
+      },
+    },
+    orderBy: { name: 'asc' },
+  });
+  res.json({ success: true, subCities });
+});
+
+router.get('/meta/kebeles', authenticateJWT, async (req, res) => {
+  const { subCityId } = req.query;
+  const where: any = {};
+  if (subCityId) {
+    where.subCityId = subCityId as string;
+  }
   const kebeles = await prisma.kebele.findMany({
-    include: { location: true },
+    where,
+    include: { location: true, subCity: true },
     orderBy: { name: 'asc' },
   });
   res.json({ success: true, kebeles });

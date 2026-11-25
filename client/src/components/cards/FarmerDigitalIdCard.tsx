@@ -170,9 +170,9 @@ export const FarmerDigitalIdCard: React.FC<FarmerDigitalIdCardProps> = ({
               </span>
             </div>
             <div>
-              <span className="text-gray-400 block text-[4.5pt] leading-none">Scheme / የመስኖ ቦታ</span>
+              <span className="text-gray-400 block text-[4.5pt] leading-none">Sub-City / ክፍለ ከተማ</span>
               <span className="font-bold text-gray-800 truncate block leading-tight">
-                {farmer.irrigationProfile?.waterSource?.replace('_', ' ') || 'Lake Tana Basin'}
+                {farmer.subCity?.name || farmer.kebele?.subCity?.name || 'ጣና ክፍለ ከተማ'}
               </span>
             </div>
             <div>
