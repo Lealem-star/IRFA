@@ -16,7 +16,7 @@ import {
   Flame,
   ArrowRight,
 } from 'lucide-react';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { MobileQrScanner } from '../../components/scanner/MobileQrScanner';
 
 export const ScannerPage: React.FC = () => {
   const { user } = useAuth();
@@ -37,36 +37,12 @@ export const ScannerPage: React.FC = () => {
 
   // Camera Scanner active toggle
   const [showCamera, setShowCamera] = useState(false);
-  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
 
-  useEffect(() => {
-    if (showCamera) {
-      const scanner = new Html5QrcodeScanner(
-        'qr-reader',
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        /* verbose= */ false
-      );
-      scannerRef.current = scanner;
-
-      scanner.render(
-        (decodedText) => {
-          setInputCode(decodedText);
-          setShowCamera(false);
-          scanner.clear();
-          executeVerification(decodedText);
-        },
-        (errorMessage) => {
-          // scanning frame error (ignore continuous scan noise)
-        }
-      );
-
-      return () => {
-        if (scannerRef.current) {
-          scannerRef.current.clear().catch((err) => console.warn(err));
-        }
-      };
-    }
-  }, [showCamera]);
+  const handleCameraScan = (decodedToken: string) => {
+    setShowCamera(false);
+    setInputCode(decodedToken);
+    executeVerification(decodedToken);
+  };
 
   const executeVerification = async (codeToVerify: string) => {
     if (!codeToVerify.trim()) return;
@@ -177,10 +153,14 @@ export const ScannerPage: React.FC = () => {
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2.5 sm:gap-3">
             <button
               onClick={() => setShowCamera(!showCamera)}
-              className="w-full sm:w-auto bg-gov-blue hover:bg-gov-blueHover active:scale-[0.98] text-white px-6 py-3 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-sm inline-flex items-center justify-center gap-2"
+              className={`w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-sm inline-flex items-center justify-center gap-2 cursor-pointer ${
+                showCamera
+                  ? 'bg-slate-800 hover:bg-slate-900 text-white'
+                  : 'bg-gov-blue hover:bg-gov-blueHover active:scale-[0.98] text-white'
+              }`}
             >
               <Camera size={18} />
-              <span>{showCamera ? 'Close Camera' : 'Start Camera Scanner'}</span>
+              <span>{showCamera ? 'Hide Camera' : 'Start Camera Scanner'}</span>
             </button>
 
             {/* Quick Demo Scan Buttons */}
@@ -191,7 +171,7 @@ export const ScannerPage: React.FC = () => {
                   setInputCode('FR-00124');
                   executeVerification('FR-00124');
                 }}
-                className="flex-1 sm:flex-none bg-white hover:bg-gray-50 border border-gov-line text-gov-ink px-3 py-2 rounded-lg text-xs font-semibold shadow-xs transition-colors"
+                className="flex-1 sm:flex-none bg-white hover:bg-gray-50 border border-gov-line text-gov-ink px-3 py-2 rounded-lg text-xs font-semibold shadow-xs transition-colors cursor-pointer"
               >
                 Demo: Abebe (FR-00124)
               </button>
@@ -201,19 +181,19 @@ export const ScannerPage: React.FC = () => {
                   setInputCode('FR-00127');
                   executeVerification('FR-00127');
                 }}
-                className="flex-1 sm:flex-none bg-white hover:bg-red-50 border border-red-200 text-red-600 px-3 py-2 rounded-lg text-xs font-semibold shadow-xs transition-colors"
+                className="flex-1 sm:flex-none bg-white hover:bg-red-50 border border-red-200 text-red-600 px-3 py-2 rounded-lg text-xs font-semibold shadow-xs transition-colors cursor-pointer"
               >
                 Demo: Suspended (FR-00127)
               </button>
             </div>
           </div>
 
-          {/* Camera Frame Container */}
-          {showCamera && (
-            <div className="mt-5 max-w-xs sm:max-w-sm mx-auto bg-slate-950 rounded-2xl overflow-hidden p-2 shadow-xl border-2 border-blue-500">
-              <div id="qr-reader" className="w-full"></div>
-            </div>
-          )}
+          {/* Dedicated High-Performance Mobile QR Camera Scanner */}
+          <MobileQrScanner
+            isOpen={showCamera}
+            onScan={handleCameraScan}
+            onClose={() => setShowCamera(false)}
+          />
 
           {/* Manual Lookup Fallback */}
           <div className="mt-5 pt-4 border-t border-[#e2eaf5] max-w-md mx-auto">
