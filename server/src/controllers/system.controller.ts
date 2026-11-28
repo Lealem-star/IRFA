@@ -104,6 +104,17 @@ export const updateUser = async (req: AuthenticatedRequest, res: Response): Prom
       return;
     }
 
+    if (req.user?.userId === id) {
+      if (data.isActive === false) {
+        res.status(400).json({ success: false, message: 'Administrators cannot deactivate their own account.' });
+        return;
+      }
+      if (data.role && data.role !== UserRole.SYSTEM_ADMIN) {
+        res.status(400).json({ success: false, message: 'Administrators cannot change their own role.' });
+        return;
+      }
+    }
+
     const updated = await prisma.user.update({
       where: { id },
       data: {

@@ -8,9 +8,11 @@ export const logAudit = async (params: {
   details?: Record<string, any> | string;
   ipAddress?: string;
   userAgent?: string;
+  tx?: any;
 }) => {
   try {
-    await prisma.auditLog.create({
+    const client = params.tx || prisma;
+    await client.auditLog.create({
       data: {
         userId: params.userId || null,
         action: params.action,
@@ -23,5 +25,8 @@ export const logAudit = async (params: {
     });
   } catch (err) {
     console.error('Failed to write audit log:', err);
+    if (params.tx) {
+      throw err;
+    }
   }
 };

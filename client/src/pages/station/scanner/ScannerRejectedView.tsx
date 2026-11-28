@@ -66,8 +66,7 @@ export const ScannerRejectedView: React.FC<ScannerRejectedViewProps> = ({
         <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-800 flex items-start gap-2">
           <HelpCircle size={15} className="shrink-0 mt-0.5 text-amber-600" />
           <span>
-            If the farmer believes this is an error, advise them to visit the Bahir Dar Agriculture
-            Office to resolve eligibility or station assignment.
+            If the farmer believes this is an error, advise them to visit an authorized station for their Sub-City, or contact the Bahir Dar Trade Office or Agriculture Office.
           </span>
         </div>
       </div>

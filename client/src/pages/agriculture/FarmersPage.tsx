@@ -23,6 +23,7 @@ export const FarmersPage: React.FC = () => {
   const [showImportModal, setShowImportModal] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   // Photo State
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -187,6 +188,7 @@ Getachew Reda,+251 918 883 344,ETH-BD-2024-1012,3.2,Diesel,14 HP,Tomato`
     }
 
     try {
+      setFieldErrors({});
       if (photoFile) {
         const payload = new FormData();
         payload.append('fullName', formData.fullName.trim());
@@ -210,6 +212,7 @@ Getachew Reda,+251 918 883 344,ETH-BD-2024-1012,3.2,Diesel,14 HP,Tomato`
           setFormData(initialFormData);
           setPhotoFile(null);
           setPhotoPreview(null);
+          setFieldErrors({});
           fetchFarmers();
         }
       } else {
@@ -231,11 +234,16 @@ Getachew Reda,+251 918 883 344,ETH-BD-2024-1012,3.2,Diesel,14 HP,Tomato`
           setFormData(initialFormData);
           setPhotoFile(null);
           setPhotoPreview(null);
+          setFieldErrors({});
           fetchFarmers();
         }
       }
     } catch (err: any) {
-      setModalError(err.response?.data?.message || 'Failed to register farmer');
+      const errData = err.response?.data;
+      setModalError(errData?.message || 'Failed to register farmer');
+      if (errData?.field) {
+        setFieldErrors({ [errData.field]: errData.message });
+      }
     } finally {
       setFormLoading(false);
     }
@@ -292,7 +300,11 @@ Getachew Reda,+251 918 883 344,ETH-BD-2024-1012,3.2,Diesel,14 HP,Tomato`
           </button>
 
           <button
-            onClick={() => setShowRegisterModal(true)}
+            onClick={() => {
+              setModalError(null);
+              setFieldErrors({});
+              setShowRegisterModal(true);
+            }}
             className="bg-gov-blue hover:bg-gov-blueHover text-white text-xs font-semibold px-3.5 py-2 rounded-[8px] transition-colors flex items-center gap-1.5 shadow-sm"
           >
             <Plus size={14} />
@@ -522,6 +534,7 @@ Getachew Reda,+251 918 883 344,ETH-BD-2024-1012,3.2,Diesel,14 HP,Tomato`
                 onClick={() => {
                   setShowRegisterModal(false);
                   setModalError(null);
+                  setFieldErrors({});
                 }}
                 className="text-gov-muted hover:text-gov-ink p-1 rounded-lg hover:bg-gray-200/60 transition-colors cursor-pointer"
               >
@@ -590,10 +603,18 @@ Getachew Reda,+251 918 883 344,ETH-BD-2024-1012,3.2,Diesel,14 HP,Tomato`
                       type="tel"
                       required
                       value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      onChange={(e) => {
+                        setFormData({ ...formData, phone: e.target.value });
+                        if (fieldErrors.phone) setFieldErrors((prev) => ({ ...prev, phone: '' }));
+                      }}
                       placeholder="+251 9... or 09..."
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:outline-none focus:border-blue-600 bg-white"
+                      className={`w-full px-3 py-2 border ${
+                        fieldErrors.phone ? 'border-red-500 bg-red-50/20' : 'border-slate-300'
+                      } rounded-lg text-xs focus:outline-none focus:border-blue-600 bg-white`}
                     />
+                    {fieldErrors.phone && (
+                      <p className="text-[11px] text-red-600 mt-1 font-medium">{fieldErrors.phone}</p>
+                    )}
                   </div>
 
                   {/* National / Kebele ID */}
@@ -604,10 +625,18 @@ Getachew Reda,+251 918 883 344,ETH-BD-2024-1012,3.2,Diesel,14 HP,Tomato`
                     <input
                       type="text"
                       value={formData.nationalId}
-                      onChange={(e) => setFormData({ ...formData, nationalId: e.target.value })}
+                      onChange={(e) => {
+                        setFormData({ ...formData, nationalId: e.target.value });
+                        if (fieldErrors.nationalId) setFieldErrors((prev) => ({ ...prev, nationalId: '' }));
+                      }}
                       placeholder="Optional ID / e.g. ETH-BD-..."
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:outline-none focus:border-blue-600 bg-white"
+                      className={`w-full px-3 py-2 border ${
+                        fieldErrors.nationalId ? 'border-red-500 bg-red-50/20' : 'border-slate-300'
+                      } rounded-lg text-xs focus:outline-none focus:border-blue-600 bg-white`}
                     />
+                    {fieldErrors.nationalId && (
+                      <p className="text-[11px] text-red-600 mt-1 font-medium">{fieldErrors.nationalId}</p>
+                    )}
                   </div>
                 </div>
 
@@ -822,6 +851,7 @@ Getachew Reda,+251 918 883 344,ETH-BD-2024-1012,3.2,Diesel,14 HP,Tomato`
                   onClick={() => {
                     setShowRegisterModal(false);
                     setModalError(null);
+                    setFieldErrors({});
                   }}
                   className="px-4 py-2 border border-slate-300 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
                 >

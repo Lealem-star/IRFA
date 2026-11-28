@@ -20,6 +20,7 @@ import {
   UserCheck,
   User as UserIcon,
   ExternalLink,
+  AlertTriangle,
 } from 'lucide-react';
 import { UserAvatar, getRoleTitle } from './UserAvatar';
 
@@ -77,6 +78,7 @@ export const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({
           { label: 'Incoming Requests', path: '/trade/requests', icon: <Send size={18} /> },
           { label: 'Fuel Authorizations', path: '/trade/authorizations', icon: <CheckCircle size={18} /> },
           { label: 'Station Assignment', path: '/trade/stations', icon: <Building2 size={18} /> },
+          { label: 'Shortage Incidents', path: '/trade/shortages', icon: <AlertTriangle size={18} /> },
         ],
       },
       {
@@ -94,6 +96,7 @@ export const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({
           { label: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={18} /> },
           { label: 'QR Verification', path: '/scanner', icon: <ScanLine size={18} /> },
           { label: 'Fuel Transactions', path: '/transactions', icon: <Receipt size={18} /> },
+          { label: 'Fuel Shortages', path: '/shortages', icon: <AlertTriangle size={18} /> },
         ],
       },
       {

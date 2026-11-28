@@ -1,0 +1,128 @@
+{
+  "passCount": 11,
+  "failCount": 0,
+  "total": 11,
+  "results": [
+    {
+      "id": "UI-S1-01",
+      "stage": "Stage 1 — Farmer Registration",
+      "scenario": "Public Institutional Landing & Login Presentation",
+      "role": "Public / Unauthenticated",
+      "expected": "Page displays \"Digital Fuel Coupon System\", Office of Agriculture branding, and login card",
+      "actual": "Title: \"Digital Fuel Coupon System | Bahir Dar City Administration Office of Agriculture\", Office: true, LoginForm: true",
+      "status": "PASS",
+      "evidence": "Screenshot captured: e2e_ui_01_landing_login.png",
+      "screenshot": "C:\\Users\\1234\\.gemini\\antigravity\\brain\\cd1b2618-018f-4d4d-a1a5-e15c803d4780\\e2e_ui_01_landing_login.png"
+    },
+    {
+      "id": "UI-S1-02",
+      "stage": "Stage 1 — Farmer Registration",
+      "scenario": "Invalid Credentials Alert Presentation",
+      "role": "Public / Unauthenticated",
+      "expected": "Visual alert displaying invalid credentials error",
+      "actual": "Alert text: \"Invalid username or password.\"",
+      "status": "PASS",
+      "evidence": "Screenshot captured: e2e_ui_02_bad_credentials.png",
+      "screenshot": "C:\\Users\\1234\\.gemini\\antigravity\\brain\\cd1b2618-018f-4d4d-a1a5-e15c803d4780\\e2e_ui_02_bad_credentials.png"
+    },
+    {
+      "id": "UI-S1-03",
+      "stage": "Stage 1 — Farmer Registration",
+      "scenario": "Agriculture Office Login and Role Redirection",
+      "role": "AGRICULTURE_OFFICE",
+      "expected": "Redirects to /dashboard with Agriculture Office role badge",
+      "actual": "URL: http://localhost:5000/dashboard, Badge verified: true",
+      "status": "PASS",
+      "evidence": "Screenshot captured: e2e_ui_03_agri_dashboard.png",
+      "screenshot": "C:\\Users\\1234\\.gemini\\antigravity\\brain\\cd1b2618-018f-4d4d-a1a5-e15c803d4780\\e2e_ui_03_agri_dashboard.png"
+    },
+    {
+      "id": "UI-S2-01",
+      "stage": "Stage 2 — Validation & Eligibility",
+      "scenario": "Farmer Registry Table and Search Interface",
+      "role": "AGRICULTURE_OFFICE",
+      "expected": "Farmer Registry presents table, search filter, and Register Farmer action",
+      "actual": "RegisterBtn: true, SearchBox: true",
+      "status": "PASS",
+      "evidence": "Screenshot captured: e2e_ui_04_farmer_registry.png",
+      "screenshot": "C:\\Users\\1234\\.gemini\\antigravity\\brain\\cd1b2618-018f-4d4d-a1a5-e15c803d4780\\e2e_ui_04_farmer_registry.png"
+    },
+    {
+      "id": "UI-S2-02",
+      "stage": "Stage 2 — Validation & Eligibility",
+      "scenario": "Farmer Details Dossier & Printable QR Card Layout",
+      "role": "AGRICULTURE_OFFICE",
+      "expected": "Farmer dossier displays irrigation profile and printable QR card element",
+      "actual": "IrrigationProfile: true, PrintableCard: true",
+      "status": "PASS",
+      "evidence": "Screenshot captured: e2e_ui_05_farmer_dossier.png",
+      "screenshot": "C:\\Users\\1234\\.gemini\\antigravity\\brain\\cd1b2618-018f-4d4d-a1a5-e15c803d4780\\e2e_ui_05_farmer_dossier.png"
+    },
+    {
+      "id": "UI-S5-01",
+      "stage": "Stage 5 — Trade Approval",
+      "scenario": "Trade Office Incoming Requests Presentation",
+      "role": "TRADE_OFFICE",
+      "expected": "Trade portal displays incoming fuel requests review interface",
+      "actual": "Trade requests view confirmed: true",
+      "status": "PASS",
+      "evidence": "Screenshot captured: e2e_ui_06_trade_requests.png",
+      "screenshot": "C:\\Users\\1234\\.gemini\\antigravity\\brain\\cd1b2618-018f-4d4d-a1a5-e15c803d4780\\e2e_ui_06_trade_requests.png"
+    },
+    {
+      "id": "UI-S7-01",
+      "stage": "Stage 7 — QR Verification",
+      "scenario": "Station Scanner Camera & Manual Entry Interface",
+      "role": "STATION_ADMIN",
+      "expected": "Station scanner view loaded with verification controls",
+      "actual": "Scanner interface present: true",
+      "status": "PASS",
+      "evidence": "Screenshot captured: e2e_ui_07_scanner_screen.png",
+      "screenshot": "C:\\Users\\1234\\.gemini\\antigravity\\brain\\cd1b2618-018f-4d4d-a1a5-e15c803d4780\\e2e_ui_07_scanner_screen.png"
+    },
+    {
+      "id": "UI-S7-02",
+      "stage": "Stage 7 — QR Verification",
+      "scenario": "Manual Code Verification Fallback Modal",
+      "role": "STATION_ADMIN",
+      "expected": "Displays manual verification dialog with text input for code/token",
+      "actual": "Manual modal opened: true, Input present: true",
+      "status": "PASS",
+      "evidence": "Screenshot captured: e2e_ui_08_scanner_manual_modal.png",
+      "screenshot": "C:\\Users\\1234\\.gemini\\antigravity\\brain\\cd1b2618-018f-4d4d-a1a5-e15c803d4780\\e2e_ui_08_scanner_manual_modal.png"
+    },
+    {
+      "id": "UI-S9-01",
+      "stage": "Stage 9 — Transaction & Receipt",
+      "scenario": "Station Dispensing Transaction Ledger UI",
+      "role": "STATION_ADMIN",
+      "expected": "Station transaction history ledger displayed with tabular layout",
+      "actual": "Transactions table loaded: true",
+      "status": "PASS",
+      "evidence": "Screenshot captured: e2e_ui_09_station_transactions.png",
+      "screenshot": "C:\\Users\\1234\\.gemini\\antigravity\\brain\\cd1b2618-018f-4d4d-a1a5-e15c803d4780\\e2e_ui_09_station_transactions.png"
+    },
+    {
+      "id": "UI-S10-01",
+      "stage": "Stage 10 — Reporting",
+      "scenario": "System Administrator Health & Operational Diagnostics",
+      "role": "SYSTEM_ADMIN",
+      "expected": "System health dashboard displays database connectivity & operational status",
+      "actual": "Health indicators rendered: true",
+      "status": "PASS",
+      "evidence": "Screenshot captured: e2e_ui_10_sysadmin_health.png",
+      "screenshot": "C:\\Users\\1234\\.gemini\\antigravity\\brain\\cd1b2618-018f-4d4d-a1a5-e15c803d4780\\e2e_ui_10_sysadmin_health.png"
+    },
+    {
+      "id": "UI-MOB-01",
+      "stage": "Cross-Cutting — Responsive Layout",
+      "scenario": "Mobile Viewport Layout Adaptation (390x844)",
+      "role": "SYSTEM_ADMIN (Mobile Viewport)",
+      "expected": "Responsive mobile adaptation without horizontal scrolling or clipping",
+      "actual": "Mobile viewport adapted: true",
+      "status": "PASS",
+      "evidence": "Screenshot captured: e2e_ui_11_mobile_responsive.png",
+      "screenshot": "C:\\Users\\1234\\.gemini\\antigravity\\brain\\cd1b2618-018f-4d4d-a1a5-e15c803d4780\\e2e_ui_11_mobile_responsive.png"
+    }
+  ]
+}

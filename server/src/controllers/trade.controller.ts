@@ -3,7 +3,19 @@ import prisma from '../config/db.js';
 import { AuthenticatedRequest } from '../types/auth.js';
 import { reviewFuelRequestSchema } from '../validators/request.validator.js';
 import { logAudit } from '../middleware/audit.js';
-import { RequestStatus, ItemStatus, AuthStatus, AssignmentStatus } from '@prisma/client';
+import { RequestStatus, ItemStatus, AuthStatus, AssignmentStatus, AllocationStatus } from '@prisma/client';
+
+export class AllocationValidationError extends Error {
+  code: string;
+  statusCode: number;
+
+  constructor(message: string, code = 'ALLOCATION_LIMIT_EXCEEDED', statusCode = 400) {
+    super(message);
+    this.name = 'AllocationValidationError';
+    this.code = code;
+    this.statusCode = statusCode;
+  }
+}
 
 export const reviewRequest = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
@@ -71,7 +83,23 @@ export const reviewRequest = async (req: AuthenticatedRequest, res: Response): P
         include: { items: true },
       });
 
-      // If approved or partially approved, create FuelAuthorization records for approved items
+      // Record immutable review history
+      await tx.fuelRequestHistory.create({
+        data: {
+          fuelRequestId: id,
+          action: data.status === 'RETURNED' ? 'RETURNED_FOR_CORRECTION' : data.status,
+          fromStatus: fuelRequest.status,
+          toStatus: data.status as RequestStatus,
+          actorId: req.user!.userId,
+          feedback: data.reviewRemarks || null,
+          snapshotData: JSON.stringify({
+            decision: data.status,
+            totalApprovedLiters,
+          }),
+        },
+      });
+
+      // If approved or partially approved, validate monthly allocation and create FuelAuthorization records
       if (data.status === 'APPROVED' || data.status === 'PARTIALLY_APPROVED') {
         const approvedItems = await tx.fuelRequestItem.findMany({
           where: {
@@ -87,7 +115,79 @@ export const reviewRequest = async (req: AuthenticatedRequest, res: Response): P
         const validFrom = new Date(year, month - 1, 1);
         const validTo = new Date(year, month, 0, 23, 59, 59);
 
+        // Track quota approved within this transaction across multiple items
+        const accumulatedApprovedInTx: Record<string, number> = {};
+
         for (const item of approvedItems) {
+          const approvedLiters = Number(item.approvedLiters);
+          if (approvedLiters <= 0) continue;
+
+          // 1. Verify MonthlyAllocation exists for this farmer, fuel type, and period
+          const allocation = await tx.monthlyAllocation.findFirst({
+            where: {
+              farmerId: item.farmerId,
+              fuelTypeId: item.fuelTypeId,
+              month,
+              year,
+            },
+          });
+
+          if (!allocation) {
+            throw new AllocationValidationError(
+              `Farmer ${item.farmerId} has no monthly fuel allocation for period ${month}/${year}. Cannot authorize fuel without an active monthly allocation.`,
+              'NO_MONTHLY_ALLOCATION',
+              400
+            );
+          }
+
+          if (allocation.status !== AllocationStatus.ACTIVE) {
+            throw new AllocationValidationError(
+              `Monthly fuel allocation for farmer ${item.farmerId} for period ${month}/${year} is not ACTIVE (current status: ${allocation.status}). Cannot authorize fuel.`,
+              'ALLOCATION_INACTIVE',
+              400
+            );
+          }
+
+          // 2. Acquire exclusive write lock on monthly allocation row to serialize concurrent reviews
+          await tx.$executeRaw`
+            UPDATE monthly_allocations
+            SET updatedAt = NOW()
+            WHERE id = ${allocation.id}
+          `;
+
+          // 3. Query existing ACTIVE authorizations using locking read (FOR UPDATE) to prevent MVCC snapshot stale reads
+          const [reservedRow] = await tx.$queryRaw<Array<{ reserved: string | number }>>`
+            SELECT COALESCE(SUM(remainingLiters), 0) AS reserved
+            FROM fuel_authorizations
+            WHERE farmerId = ${item.farmerId}
+              AND fuelTypeId = ${item.fuelTypeId}
+              AND status = 'ACTIVE'
+              AND fuelRequestItemId != ${item.id}
+              AND (
+                validFrom <= ${validTo} AND validTo >= ${validFrom}
+              )
+            FOR UPDATE
+          `;
+
+          const outstandingReserved = Number(reservedRow?.reserved || 0);
+
+          const farmerFuelKey = `${item.farmerId}_${item.fuelTypeId}`;
+          const inTxReserved = accumulatedApprovedInTx[farmerFuelKey] || 0;
+          const totalReserved = outstandingReserved + inTxReserved;
+          const allocRemaining = Number(allocation.remainingLiters);
+          const availableQuota = allocRemaining - totalReserved;
+
+          if (approvedLiters > availableQuota) {
+            throw new AllocationValidationError(
+              `Approved liters (${approvedLiters} L) exceeds available monthly allocation quota (${Math.max(0, availableQuota)} L available: allocated ${allocation.allocatedLiters} L, remaining ${allocRemaining} L, active reservations ${totalReserved} L).`,
+              'ALLOCATION_LIMIT_EXCEEDED',
+              400
+            );
+          }
+
+          accumulatedApprovedInTx[farmerFuelKey] = inTxReserved + approvedLiters;
+
+          // 4. Create or update FuelAuthorization record
           const authCode = `AUTH-${year}${month.toString().padStart(2, '0')}-${item.id.slice(-5).toUpperCase()}`;
 
           // Check if auth already exists for item
@@ -117,6 +217,9 @@ export const reviewRequest = async (req: AuthenticatedRequest, res: Response): P
       }
 
       return updatedReq;
+    }, {
+      maxWait: 20000,
+      timeout: 45000,
     });
 
     await logAudit({
@@ -133,8 +236,21 @@ export const reviewRequest = async (req: AuthenticatedRequest, res: Response): P
       message: `Request ${fuelRequest.requestNumber} review completed (${data.status})`,
       request: reviewed,
     });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Failed to process request review', error });
+  } catch (error: any) {
+    if (error instanceof AllocationValidationError) {
+      res.status(error.statusCode).json({
+        success: false,
+        code: error.code,
+        message: error.message,
+      });
+      return;
+    }
+    if (error?.name === 'ZodError') {
+      res.status(400).json({ success: false, message: 'Validation failed', errors: error.errors });
+      return;
+    }
+    console.error('Failed to process request review:', error);
+    res.status(500).json({ success: false, message: 'Failed to process request review', error: error?.message || error });
   }
 };
 
@@ -265,6 +381,111 @@ export const listAuthorizations = async (req: AuthenticatedRequest, res: Respons
     });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to retrieve authorizations', error });
+  }
+};
+
+export const revokeAuthorization = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body || {};
+
+    const result = await prisma.$transaction(async (tx) => {
+      const auth = await tx.fuelAuthorization.findUnique({
+        where: { id },
+        include: {
+          fuelRequest: true,
+          fuelType: true,
+          farmer: true,
+        },
+      });
+
+      if (!auth) {
+        throw new AllocationValidationError('Fuel authorization not found', 'AUTHORIZATION_NOT_FOUND', 404);
+      }
+
+      if (auth.status === AuthStatus.REVOKED) {
+        throw new AllocationValidationError(
+          'Authorization has already been revoked. Cannot revoke or release quantity twice.',
+          'AUTHORIZATION_ALREADY_REVOKED',
+          400
+        );
+      }
+
+      if (auth.status === AuthStatus.EXHAUSTED || Number(auth.remainingLiters) <= 0) {
+        throw new AllocationValidationError(
+          'Authorization has already been completely exhausted (0 L remaining). Cannot revoke.',
+          'AUTHORIZATION_EXHAUSTED',
+          400
+        );
+      }
+
+      if (auth.status !== AuthStatus.ACTIVE) {
+        throw new AllocationValidationError(
+          `Cannot revoke authorization with status ${auth.status}. Only ACTIVE authorizations can be revoked.`,
+          'AUTHORIZATION_NOT_ACTIVE',
+          400
+        );
+      }
+
+      const releasedLiters = Number(auth.remainingLiters);
+      const noteAppend = `[REVOKED: ${reason || 'Administrative revocation'}]`;
+
+      const updatedAuth = await tx.fuelAuthorization.update({
+        where: { id },
+        data: {
+          status: AuthStatus.REVOKED,
+          remarks: auth.remarks ? `${auth.remarks} ${noteAppend}` : noteAppend,
+        },
+      });
+
+      // Revoke any active station assignments
+      await tx.stationAssignment.updateMany({
+        where: {
+          fuelAuthorizationId: id,
+          status: AssignmentStatus.ACTIVE,
+        },
+        data: {
+          status: AssignmentStatus.REVOKED,
+          notes: `Revoked with authorization ${auth.authCode}`,
+        },
+      });
+
+      return { updatedAuth, releasedLiters };
+    }, {
+      maxWait: 20000,
+      timeout: 45000,
+    });
+
+    await logAudit({
+      userId: req.user?.userId,
+      action: 'REVOKE_FUEL_AUTHORIZATION',
+      entityType: 'FuelAuthorization',
+      entityId: id,
+      details: {
+        authCode: result.updatedAuth.authCode,
+        releasedLiters: result.releasedLiters,
+        reason,
+      },
+      ipAddress: req.ip,
+    });
+
+    res.json({
+      success: true,
+      message: `Authorization ${result.updatedAuth.authCode} successfully revoked. ${result.releasedLiters} L released back to available allocation.`,
+      authorization: result.updatedAuth,
+      releasedLiters: result.releasedLiters,
+    });
+  } catch (error: any) {
+    if (error instanceof AllocationValidationError) {
+      res.status(error.statusCode).json({
+        success: false,
+        code: error.code,
+        message: error.message,
+      });
+      return;
+    }
+    console.error('Failed to revoke authorization:', error);
+    res.status(500).json({ success: false, message: 'Failed to revoke authorization', error: error?.message || error });
   }
 };
 

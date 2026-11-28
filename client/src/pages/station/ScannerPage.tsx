@@ -37,6 +37,15 @@ export const ScannerPage: React.FC = () => {
   const [dispenseError, setDispenseError] = useState<string | null>(null);
   const [receiptData, setReceiptData] = useState<FuelTransaction | null>(null);
   const [remainingAfter, setRemainingAfter] = useState<number>(0);
+  const [dispenseIdempotencyKey, setDispenseIdempotencyKey] = useState<string | null>(null);
+
+  // Helper to generate a collision-resistant UUID v4 or random key
+  const generateIdempotencyKey = (): string => {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+    return `idemp_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+  };
 
   // Modal Dialogs
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
@@ -60,6 +69,7 @@ export const ScannerPage: React.FC = () => {
 
       if (res.data.success && res.data.verified) {
         setVerifiedData(res.data.data);
+        setDispenseIdempotencyKey(generateIdempotencyKey());
         setStep('AUTHORIZED');
       } else {
         setRejectionReason(res.data.rejectionReason || 'Record not eligible for fuel access.');
@@ -77,18 +87,26 @@ export const ScannerPage: React.FC = () => {
     }
   };
 
-  // Execute dispensing transaction against existing backend endpoint
+  // Execute dispensing transaction against existing backend endpoint with SEC-01 idempotency protection
   const executeDispense = async (quantityLiters: number, notes: string) => {
     if (!verifiedData) return;
+    if (isDispenseSubmitting) return; // Guard against concurrent button clicks
 
     setIsDispenseSubmitting(true);
     setDispenseError(null);
+
+    // Retrieve or establish idempotency key for this dispensing attempt
+    const activeKey = dispenseIdempotencyKey || generateIdempotencyKey();
+    if (!dispenseIdempotencyKey) {
+      setDispenseIdempotencyKey(activeKey);
+    }
 
     try {
       const res = await api.post('/transactions/dispense', {
         authorizationId: verifiedData.authorization.id,
         quantityLiters,
         notes,
+        idempotencyKey: activeKey,
       });
 
       if (res.data.success) {
@@ -97,6 +115,7 @@ export const ScannerPage: React.FC = () => {
         setStep('RECEIPT');
       }
     } catch (err: any) {
+      // Retain activeKey so network timeout retries preserve the same idempotency key
       setDispenseError(err.response?.data?.message || 'Dispensing transaction failed. Please retry.');
     } finally {
       setIsDispenseSubmitting(false);
@@ -111,6 +130,7 @@ export const ScannerPage: React.FC = () => {
     setDispenseError(null);
     setReceiptData(null);
     setRemainingAfter(0);
+    setDispenseIdempotencyKey(null);
     setStep('SCANNING');
   };
 

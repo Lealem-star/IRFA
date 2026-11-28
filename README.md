@@ -160,6 +160,26 @@ IRFA/
 
 ---
 
-## 8. Institutional Ownership & Credits
+## 8. Project Roadmap & Implementation Milestones
+
+| Phase | Scope | Status |
+|---|---|---|
+| **Phase 0** | Database Safety Audit | Completed |
+| **Phase 1** | Official Station Foundation | Completed |
+| **Phase 2** | Representative Management & Security | Completed |
+| **Phase 3** | Station/Sub-City Allocations | Completed |
+| **Phase 4** | QR Verification & Dispensing Enforcement | Completed |
+| **Phase 5** | Agriculture Feedback & Resubmission | Completed |
+| **Phase 6** | Shortage Management, Dashboards & Reports | Completed |
+| **Phase 7** | Final QA & Security Audit | Completed |
+| **Phase 8A** | Technical & Security Safeguard Remediation | **FORMALLY CLOSED** |
+| **Phase 8B** | Administrative Data Reconciliation & Development Database Normalization | **NOT STARTED** |
+| **Controlled Pilot** | Controlled operational pilot | **NOT AUTHORIZED** |
+
+> For formal milestone closure records, remediated findings summary, and reported verification evidence, see [PHASE_8A_FORMAL_CLOSURE.md](PHASE_8A_FORMAL_CLOSURE.md).
+
+---
+
+## 9. Institutional Ownership & Credits
 - **Institutional Owner:** **Bahir Dar City Administration Office of Agriculture** (*የባሕር ዳር ከተማ አስተዳደር ግብርና መምሪያ*), Amhara Region, Ethiopia.
 - **Technology Partner:** **Enqopa Technologies PLC** (Powered by Bahir Dar City Administration Office of Agriculture · Developed by Enqopa Technologies PLC).

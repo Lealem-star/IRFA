@@ -1,5 +1,19 @@
-import { PrismaClient, UserRole, EligibilityStatus, WaterSource, CardStatus, RequestStatus, ItemStatus, AuthStatus, AssignmentStatus, TransactionStatus, VerificationResult } from '@prisma/client';
+import {
+  PrismaClient,
+  UserRole,
+  EligibilityStatus,
+  WaterSource,
+  CardStatus,
+  RequestStatus,
+  ItemStatus,
+  AuthStatus,
+  AssignmentStatus,
+  TransactionStatus,
+  VerificationResult,
+} from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { OFFICIAL_STATIONS_MASTER } from '../src/config/officialStations.js';
+import { OFFICIAL_SUB_CITIES } from '../src/config/officialLocations.js';
 
 const prisma = new PrismaClient();
 
@@ -13,19 +27,23 @@ async function main() {
 
   console.log('Seeding IRFA Database for Bahir Dar City Administration...');
 
-  // Clean existing tables in reverse order of foreign keys
+  // 0. Clean existing tables in strict reverse order of foreign keys
   await prisma.verificationLog.deleteMany();
   await prisma.fuelTransaction.deleteMany();
   await prisma.stationAssignment.deleteMany();
+  await prisma.stationSubCityAssignment.deleteMany();
   await prisma.fuelAuthorization.deleteMany();
+  await prisma.fuelRequestHistory.deleteMany();
   await prisma.fuelRequestItem.deleteMany();
   await prisma.fuelRequest.deleteMany();
+  await prisma.fuelShortage.deleteMany();
   await prisma.monthlyAllocation.deleteMany();
   await prisma.farmerCard.deleteMany();
   await prisma.farmerIrrigationProfile.deleteMany();
   await prisma.farmer.deleteMany();
   await prisma.kebele.deleteMany();
   await prisma.location.deleteMany();
+  await prisma.subCity.deleteMany();
   await prisma.fuelType.deleteMany();
   await prisma.auditLog.deleteMany();
   await prisma.systemSetting.deleteMany();
@@ -33,7 +51,7 @@ async function main() {
   await prisma.fuelStation.deleteMany();
   await prisma.office.deleteMany();
 
-  // 1. Create Offices
+  // 1. Create Municipal Offices
   const agriOffice = await prisma.office.create({
     data: {
       code: 'BD-AGRI',
@@ -61,44 +79,30 @@ async function main() {
     },
   });
 
-  // 2. Create Fuel Stations
-  const stationA = await prisma.fuelStation.create({
-    data: {
-      code: 'BD-ST-01',
-      name: 'Tana Energy Fuel Station (Station A)',
-      location: 'Lake Tana Shore Boulevard, Bahir Dar',
-      contactPerson: 'Yohannes Getachew',
-      phone: '+251 918 700 001',
-      licenseNumber: 'BD-FUEL-2024-88',
-      isActive: true,
-    },
-  });
+  // 2. Create Official Fuel Stations (Reconciled Official Roster: 21 Stations)
+  const stationsMap = new Map<string, any>();
+  for (const def of OFFICIAL_STATIONS_MASTER) {
+    const st = await prisma.fuelStation.create({
+      data: {
+        code: def.assignedCode,
+        name: def.officialName,
+        nameAmharic: def.nameAmharic || null,
+        company: def.company || null,
+        location: def.location || 'Bahir Dar',
+        contactPerson: 'Station Manager',
+        phone: '+251 918 000 000',
+        licenseNumber: `BD-LIC-${def.assignedCode}`,
+        isActive: true,
+      },
+    });
+    stationsMap.set(def.assignedCode, st);
+  }
+  console.log(`Seeded ${stationsMap.size} official Bahir Dar fuel stations.`);
 
-  const stationB = await prisma.fuelStation.create({
-    data: {
-      code: 'BD-ST-02',
-      name: 'Abay Petroleum Hub (Station B)',
-      location: 'Kebele 02 Ring Road, Bahir Dar',
-      contactPerson: 'Birtukan Mengistu',
-      phone: '+251 918 700 002',
-      licenseNumber: 'BD-FUEL-2024-89',
-      isActive: true,
-    },
-  });
+  const stationGhion = stationsMap.get('BD-ST-01')!;
+  const stationAbayBus = stationsMap.get('BD-ST-02')!;
 
-  const stationC = await prisma.fuelStation.create({
-    data: {
-      code: 'BD-ST-03',
-      name: 'Tis Abay Agro-Fuel Depot',
-      location: 'Tis Abay Highway Junction, Bahir Dar',
-      contactPerson: 'Ephrem Assefa',
-      phone: '+251 918 700 003',
-      licenseNumber: 'BD-FUEL-2024-90',
-      isActive: true,
-    },
-  });
-
-  // 3. Create Users
+  // 3. Create Core Administrative & Station Users
   const passwordHash = await bcrypt.hash('demo123', 10);
 
   const userAgri = await prisma.user.create({
@@ -128,11 +132,11 @@ async function main() {
   const userStation = await prisma.user.create({
     data: {
       username: 'station',
-      email: 'station.admin@tanaenergy.com',
+      email: 'station.admin@ghionpetroleum.et',
       passwordHash,
-      fullName: 'Tana Station Administrator',
+      fullName: 'Ghion Fuel Station Operator',
       role: UserRole.STATION_ADMIN,
-      fuelStationId: stationA.id,
+      fuelStationId: stationGhion.id,
       isActive: true,
     },
   });
@@ -149,62 +153,81 @@ async function main() {
     },
   });
 
-  // 4. Create Locations and Kebeles
-  const locationZuria = await prisma.location.create({
+  // 4. Create Locations, Official Sub-Cities (4) and Official Kebeles (45)
+  const defaultLocation = await prisma.location.create({
     data: {
       name: 'Bahir Dar Zuria & Lake Basin',
       subCity: 'Bahir Dar Perimeter',
     },
   });
 
-  const kebeleTana = await prisma.kebele.create({
-    data: {
-      name: 'Tana Kebele (01)',
-      code: 'BD-KEB-01',
-      locationId: locationZuria.id,
-    },
-  });
+  const subCityMap = new Map<string, any>();
+  const kebeleMap = new Map<string, any>();
 
-  const kebeleZenzelma = await prisma.kebele.create({
-    data: {
-      name: 'Zenzelma Kebele (02)',
-      code: 'BD-KEB-02',
-      locationId: locationZuria.id,
-    },
-  });
+  for (const scDef of OFFICIAL_SUB_CITIES) {
+    const sc = await prisma.subCity.create({
+      data: {
+        code: scDef.code,
+        name: scDef.name,
+        nameAmharic: scDef.name,
+      },
+    });
+    subCityMap.set(scDef.code, sc);
 
-  const kebeleShumeta = await prisma.kebele.create({
-    data: {
-      name: 'Shumeta Kebele (03)',
-      code: 'BD-KEB-03',
-      locationId: locationZuria.id,
-    },
-  });
+    for (const kbDef of scDef.kebeles) {
+      const kb = await prisma.kebele.create({
+        data: {
+          code: kbDef.code,
+          name: kbDef.name,
+          subCityId: sc.id,
+          locationId: defaultLocation.id,
+        },
+      });
+      kebeleMap.set(kbDef.code, kb);
+    }
+  }
+  console.log(`Seeded ${subCityMap.size} official sub-cities and ${kebeleMap.size} official kebeles.`);
 
-  const kebeleWeramit = await prisma.kebele.create({
-    data: {
-      name: 'Weramit Kebele (04)',
-      code: 'BD-KEB-04',
-      locationId: locationZuria.id,
-    },
-  });
+  // 5. Deterministic Station-to-SubCity Allocations (StationSubCityAssignment)
+  // Mapping the 21 official stations across the 4 official sub-cities to ensure 100% municipal coverage
+  const subCityStationCodes: Record<string, string[]> = {
+    'SC-TANA': ['BD-ST-01', 'BD-ST-07', 'BD-ST-08', 'BD-ST-14', 'BD-ST-19'],
+    'SC-BELAY-ZELEKE': ['BD-ST-04', 'BD-ST-05', 'BD-ST-12', 'BD-ST-17', 'BD-ST-21'],
+    'SC-DAGMAWI-MENELIK': ['BD-ST-06', 'BD-ST-09', 'BD-ST-13', 'BD-ST-16', 'BD-ST-18', 'BD-ST-22'],
+    'SC-ATSE-TEWODROS': ['BD-ST-02', 'BD-ST-10', 'BD-ST-11', 'BD-ST-15', 'BD-ST-20'],
+  };
 
-  const kebeleShimbit = await prisma.kebele.create({
-    data: {
-      name: 'Shimbit Kebele (05)',
-      code: 'BD-KEB-05',
-      locationId: locationZuria.id,
-    },
-  });
+  let assignmentCount = 0;
+  for (const [subCityCode, stationCodes] of Object.entries(subCityStationCodes)) {
+    const sc = subCityMap.get(subCityCode);
+    if (!sc) continue;
 
-  // 5. Create Fuel Types
+    for (const stCode of stationCodes) {
+      const st = stationsMap.get(stCode);
+      if (!st) continue;
+
+      await prisma.stationSubCityAssignment.create({
+        data: {
+          subCityId: sc.id,
+          fuelStationId: st.id,
+          assignedById: userTrade.id,
+          status: AssignmentStatus.ACTIVE,
+          notes: `Official Trade Office allocation for ${sc.name}`,
+        },
+      });
+      assignmentCount++;
+    }
+  }
+  console.log(`Seeded ${assignmentCount} deterministic station-to-subcity assignments across all 4 sub-cities.`);
+
+  // 6. Create Official Fuel Types
   const diesel = await prisma.fuelType.create({
     data: {
       name: 'Diesel',
       nameAmharic: 'ናፍጣ',
       code: 'DIESEL',
       unit: 'Liters',
-      currentPricePerLiter: 104.50,
+      currentPricePerLiter: 104.5,
       isActive: true,
     },
   });
@@ -215,20 +238,33 @@ async function main() {
       nameAmharic: 'ቤንዚን',
       code: 'BENZENE',
       unit: 'Liters',
-      currentPricePerLiter: 115.20,
+      currentPricePerLiter: 115.2,
       isActive: true,
     },
   });
 
-  // 6. Create Farmers with Irrigation Profiles and Cards
-  // Farmer 1: Abebe Tesfaye (Eligible, Diesel, Card Issued, Has Active Allocation & Trade Auth at Station A)
+  // 7. Create Farmers with Irrigation Profiles and Cards
+  const scTana = subCityMap.get('SC-TANA')!;
+  const scAtse = subCityMap.get('SC-ATSE-TEWODROS')!;
+  const scDagmawi = subCityMap.get('SC-DAGMAWI-MENELIK')!;
+  const scBelay = subCityMap.get('SC-BELAY-ZELEKE')!;
+
+  const kbChenta = kebeleMap.get('KB-TANA-01')!;
+  const kbWeramit = kebeleMap.get('KB-TANA-02')!;
+  const kbShimbit = kebeleMap.get('KB-TANA-11')!;
+  const kbZenzelma = kebeleMap.get('KB-AT-06')!;
+  const kbSelam = kebeleMap.get('KB-DM-01')!;
+  const kbSebatAmit = kebeleMap.get('KB-BZ-04')!;
+
+  // Farmer 1: Abebe Tesfaye (Eligible, Diesel, Card Issued, SC-TANA, Station BD-ST-01)
   const farmer1 = await prisma.farmer.create({
     data: {
       farmerCode: 'FR-00124',
       fullName: 'Abebe Tesfaye',
       phone: '+251 918 112 233',
       nationalId: 'ETH-BD-2024-1001',
-      kebeleId: kebeleTana.id,
+      subCityId: scTana.id,
+      kebeleId: kbChenta.id,
       eligibilityStatus: EligibilityStatus.ELIGIBLE,
       isActive: true,
       irrigationProfile: {
@@ -254,14 +290,15 @@ async function main() {
     },
   });
 
-  // Farmer 2: Mulugeta Kebede (Eligible, Benzene, Card Issued, Has Active Allocation & Trade Auth at Station A)
+  // Farmer 2: Mulugeta Kebede (Eligible, Benzene, Card Issued, SC-ATSE-TEWODROS, Station BD-ST-02)
   const farmer2 = await prisma.farmer.create({
     data: {
       farmerCode: 'FR-00125',
       fullName: 'Mulugeta Kebede',
       phone: '+251 918 223 344',
       nationalId: 'ETH-BD-2024-1002',
-      kebeleId: kebeleZenzelma.id,
+      subCityId: scAtse.id,
+      kebeleId: kbZenzelma.id,
       eligibilityStatus: EligibilityStatus.ELIGIBLE,
       isActive: true,
       irrigationProfile: {
@@ -287,14 +324,15 @@ async function main() {
     },
   });
 
-  // Farmer 3: Hana Worku (Under Review, Diesel, Card Pending)
+  // Farmer 3: Hana Worku (Under Review, Diesel, Card Pending, SC-DAGMAWI-MENELIK)
   const farmer3 = await prisma.farmer.create({
     data: {
       farmerCode: 'FR-00126',
       fullName: 'Hana Worku',
       phone: '+251 918 334 455',
       nationalId: 'ETH-BD-2024-1003',
-      kebeleId: kebeleShumeta.id,
+      subCityId: scDagmawi.id,
+      kebeleId: kbSelam.id,
       eligibilityStatus: EligibilityStatus.UNDER_REVIEW,
       isActive: true,
       irrigationProfile: {
@@ -320,14 +358,15 @@ async function main() {
     },
   });
 
-  // Farmer 4: Kassahun Alemu (Suspended, Diesel, Card Deactivated)
+  // Farmer 4: Kassahun Alemu (Suspended, Diesel, Card Deactivated, SC-TANA)
   const farmer4 = await prisma.farmer.create({
     data: {
       farmerCode: 'FR-00127',
       fullName: 'Kassahun Alemu',
       phone: '+251 918 445 566',
       nationalId: 'ETH-BD-2024-1004',
-      kebeleId: kebeleTana.id,
+      subCityId: scTana.id,
+      kebeleId: kbWeramit.id,
       eligibilityStatus: EligibilityStatus.SUSPENDED,
       isActive: false,
       suspensionReason: 'Land tenure verification inquiry and quota diversion audit',
@@ -356,14 +395,15 @@ async function main() {
     },
   });
 
-  // Farmer 5: Almaz Tadesse (Eligible, Benzene, Card Active)
+  // Farmer 5: Almaz Tadesse (Eligible, Benzene, Card Active, SC-BELAY-ZELEKE)
   const farmer5 = await prisma.farmer.create({
     data: {
       farmerCode: 'FR-00128',
       fullName: 'Almaz Tadesse',
       phone: '+251 918 556 677',
       nationalId: 'ETH-BD-2024-1005',
-      kebeleId: kebeleWeramit.id,
+      subCityId: scBelay.id,
+      kebeleId: kbSebatAmit.id,
       eligibilityStatus: EligibilityStatus.ELIGIBLE,
       isActive: true,
       irrigationProfile: {
@@ -389,14 +429,15 @@ async function main() {
     },
   });
 
-  // Farmer 6: Demissew Belay (Eligible, Diesel, Card Active)
+  // Farmer 6: Demissew Belay (Eligible, Diesel, Card Active, SC-TANA)
   const farmer6 = await prisma.farmer.create({
     data: {
       farmerCode: 'FR-00129',
       fullName: 'Demissew Belay',
       phone: '+251 918 667 788',
       nationalId: 'ETH-BD-2024-1006',
-      kebeleId: kebeleShimbit.id,
+      subCityId: scTana.id,
+      kebeleId: kbShimbit.id,
       eligibilityStatus: EligibilityStatus.ELIGIBLE,
       isActive: true,
       irrigationProfile: {
@@ -422,7 +463,7 @@ async function main() {
     },
   });
 
-  // 7. Monthly Fuel Allocations (November 2026)
+  // 8. Monthly Fuel Allocations (November 2026)
   await prisma.monthlyAllocation.createMany({
     data: [
       {
@@ -463,7 +504,7 @@ async function main() {
         allocatedLiters: 100.0,
         usedLiters: 0.0,
         remainingLiters: 100.0,
-        notes: 'Monthly allocation for Weramit Kebele group',
+        notes: 'Monthly allocation for Sebat Amit Kebele group',
       },
       {
         farmerId: farmer6.id,
@@ -478,14 +519,14 @@ async function main() {
     ],
   });
 
-  // 8. Fuel Requests to Trade Office
+  // 9. Fuel Requests to Trade Office
   // Request A: TR-2026-040 (Approved request with Authorizations and Station Assignments)
   const reqApproved = await prisma.fuelRequest.create({
     data: {
       requestNumber: 'TR-2026-040',
       periodMonth: 11,
       periodYear: 2026,
-      title: 'Tana & Zenzelma Kebeles Monthly Fuel Request',
+      title: 'Tana & Atse Tewodros Kebeles Monthly Fuel Request',
       totalFarmersCount: 94,
       totalLitersRequested: 9200.0,
       totalLitersApproved: 9200.0,
@@ -498,7 +539,6 @@ async function main() {
     },
   });
 
-  // Items in Request A
   const reqItem1 = await prisma.fuelRequestItem.create({
     data: {
       fuelRequestId: reqApproved.id,
@@ -537,7 +577,7 @@ async function main() {
       validFrom: new Date('2026-11-01T00:00:00Z'),
       validTo: new Date('2026-11-30T23:59:59Z'),
       status: AuthStatus.ACTIVE,
-      remarks: 'Authorized for Tana Energy Station dispensing',
+      remarks: 'Authorized for Ghion Fuel Station dispensing',
     },
   });
 
@@ -554,28 +594,28 @@ async function main() {
       validFrom: new Date('2026-11-01T00:00:00Z'),
       validTo: new Date('2026-11-30T23:59:59Z'),
       status: AuthStatus.ACTIVE,
-      remarks: 'Authorized for Tana Energy Station dispensing',
+      remarks: 'Authorized for Total Abay Bus Station dispensing',
     },
   });
 
-  // Assign Station A to both Authorizations
+  // Station Authorization Assignments
   await prisma.stationAssignment.create({
     data: {
       fuelAuthorizationId: auth1.id,
-      fuelStationId: stationA.id,
+      fuelStationId: stationGhion.id,
       assignedById: userTrade.id,
       status: AssignmentStatus.ACTIVE,
-      notes: 'Assigned to Tana Station for convenient farmer collection',
+      notes: 'Assigned to Ghion Station for convenient farmer collection',
     },
   });
 
   await prisma.stationAssignment.create({
     data: {
       fuelAuthorizationId: auth2.id,
-      fuelStationId: stationA.id,
+      fuelStationId: stationAbayBus.id,
       assignedById: userTrade.id,
       status: AssignmentStatus.ACTIVE,
-      notes: 'Assigned to Tana Station for convenient farmer collection',
+      notes: 'Assigned to Total Abay Bus Station for Atse Tewodros farmers',
     },
   });
 
@@ -585,7 +625,7 @@ async function main() {
       requestNumber: 'TR-2026-041',
       periodMonth: 11,
       periodYear: 2026,
-      title: 'Shumeta & Weramit Kebeles Fuel Allocation Phase II',
+      title: 'Dagmawi Menelik & Belay Zeleke Kebeles Fuel Allocation Phase II',
       totalFarmersCount: 128,
       totalLitersRequested: 12600.0,
       totalLitersApproved: 0.0,
@@ -634,22 +674,22 @@ async function main() {
       submittedAt: new Date('2026-10-04T10:00:00Z'),
       reviewedById: userTrade.id,
       reviewedAt: new Date('2026-10-06T15:30:00Z'),
-      reviewRemarks: 'Reduced 1,500 L for incomplete Kebele 03 land registration records.',
+      reviewRemarks: 'Reduced 1,500 L for incomplete land registration records.',
     },
   });
 
-  // 9. Initial Fuel Transactions for Station A
+  // 10. Initial Fuel Transactions
   await prisma.fuelTransaction.create({
     data: {
       receiptNumber: 'TX-20261123-0001',
-      fuelStationId: stationA.id,
+      fuelStationId: stationGhion.id,
       operatorId: userStation.id,
       farmerId: farmer1.id,
       fuelAuthorizationId: auth1.id,
       fuelTypeId: diesel.id,
       quantityLiters: 80.0,
-      pricePerLiter: 104.50,
-      totalAmount: 8360.00,
+      pricePerLiter: 104.5,
+      totalAmount: 8360.0,
       transactionDate: new Date('2026-11-23T09:42:00Z'),
       status: TransactionStatus.COMPLETED,
       notes: 'First dispensing from November quota. Barrels verified.',
@@ -659,24 +699,24 @@ async function main() {
   await prisma.fuelTransaction.create({
     data: {
       receiptNumber: 'TX-20261123-0002',
-      fuelStationId: stationA.id,
+      fuelStationId: stationAbayBus.id,
       operatorId: userStation.id,
       farmerId: farmer2.id,
       fuelAuthorizationId: auth2.id,
       fuelTypeId: benzene.id,
       quantityLiters: 40.0,
-      pricePerLiter: 115.20,
-      totalAmount: 4608.00,
+      pricePerLiter: 115.2,
+      totalAmount: 4608.0,
       transactionDate: new Date('2026-11-23T10:16:00Z'),
       status: TransactionStatus.COMPLETED,
       notes: 'Dispensed into approved jerrycans.',
     },
   });
 
-  // 10. Sample Verification Logs
+  // 11. Initial Verification Logs
   await prisma.verificationLog.create({
     data: {
-      fuelStationId: stationA.id,
+      fuelStationId: stationGhion.id,
       operatorId: userStation.id,
       farmerId: farmer1.id,
       scannedToken: 'QR-FR-00124-ABEBE-BD-SECURE',
@@ -687,7 +727,7 @@ async function main() {
 
   await prisma.verificationLog.create({
     data: {
-      fuelStationId: stationA.id,
+      fuelStationId: stationAbayBus.id,
       operatorId: userStation.id,
       farmerId: farmer2.id,
       scannedToken: 'QR-FR-00125-MULUGETA-BD-SECURE',
@@ -698,7 +738,7 @@ async function main() {
 
   await prisma.verificationLog.create({
     data: {
-      fuelStationId: stationA.id,
+      fuelStationId: stationGhion.id,
       operatorId: userStation.id,
       farmerId: farmer4.id,
       scannedToken: 'QR-FR-00127-KASSAHUN-BD-DEACTIVATED',
@@ -708,7 +748,7 @@ async function main() {
     },
   });
 
-  // 11. System Settings
+  // 12. System Settings
   await prisma.systemSetting.createMany({
     data: [
       {
@@ -750,7 +790,7 @@ async function main() {
     ],
   });
 
-  // 12. Audit Logs
+  // 13. Audit Logs
   await prisma.auditLog.createMany({
     data: [
       {
@@ -765,8 +805,8 @@ async function main() {
         userId: userTrade.id,
         action: 'STATION_ASSIGNMENT',
         entityType: 'StationAssignment',
-        entityId: stationA.id,
-        details: 'Assigned TR-2026-040 approved farmers to Tana Energy Station A.',
+        entityId: stationGhion.id,
+        details: 'Assigned TR-2026-040 approved farmers to Ghion Fuel Station.',
         ipAddress: '127.0.0.1',
       },
       {

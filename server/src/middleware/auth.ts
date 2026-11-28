@@ -11,10 +11,12 @@ export const authenticateJWT = async (
   try {
     let token: string | undefined;
 
-    // Check Authorization header
+    // Check Authorization header, query parameter (for media/images), or cookie
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       token = authHeader.substring(7);
+    } else if (req.query && typeof req.query.token === 'string') {
+      token = req.query.token;
     } else if (req.cookies && req.cookies.token) {
       token = req.cookies.token;
     }

@@ -19,6 +19,7 @@ import {
   Activity,
   LogOut,
   UserCheck,
+  AlertTriangle,
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
@@ -67,6 +68,9 @@ export const Sidebar: React.FC = () => {
           { label: 'Incoming Requests', path: '/trade/requests', icon: <Send size={17} /> },
           { label: 'Fuel Authorizations', path: '/trade/authorizations', icon: <CheckCircle size={17} /> },
           { label: 'Station Assignment', path: '/trade/stations', icon: <Building2 size={17} /> },
+          { label: 'Station Representatives', path: '/trade/representatives', icon: <UserCheck size={17} /> },
+          { label: 'Sub-City Allocations', path: '/trade/allocations', icon: <Layers size={17} /> },
+          { label: 'Shortage Incidents', path: '/trade/shortages', icon: <AlertTriangle size={17} /> },
         ],
       },
       {
@@ -84,6 +88,7 @@ export const Sidebar: React.FC = () => {
           { label: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={17} /> },
           { label: 'QR Verification', path: '/scanner', icon: <ScanLine size={17} /> },
           { label: 'Fuel Transactions', path: '/transactions', icon: <Receipt size={17} /> },
+          { label: 'Fuel Shortages', path: '/shortages', icon: <AlertTriangle size={17} /> },
         ],
       },
     ],

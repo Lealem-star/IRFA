@@ -1,16 +1,22 @@
 import { Response } from 'express';
+import path from 'path';
+import fs from 'fs';
 import prisma from '../config/db.js';
 import { AuthenticatedRequest } from '../types/auth.js';
-import { createFarmerSchema, updateFarmerSchema } from '../validators/farmer.validator.js';
+import { createFarmerSchema, updateFarmerSchema, normalizeEthiopianPhone } from '../validators/farmer.validator.js';
 import { logAudit } from '../middleware/audit.js';
 import { EligibilityStatus, CardStatus, WaterSource } from '@prisma/client';
 import crypto from 'crypto';
 
-// Helper to generate next Farmer ID e.g. FR-00130
+// Helper to generate next Farmer ID e.g. FR-00130, ensuring no collision
 const generateFarmerCode = async (): Promise<string> => {
-  const count = await prisma.farmer.count();
-  const nextNum = (count + 125).toString().padStart(5, '0');
-  return `FR-${nextNum}`;
+  let nextNum = (await prisma.farmer.count()) + 125;
+  let code = `FR-${nextNum.toString().padStart(5, '0')}`;
+  while (await prisma.farmer.findUnique({ where: { farmerCode: code } })) {
+    nextNum++;
+    code = `FR-${nextNum.toString().padStart(5, '0')}`;
+  }
+  return code;
 };
 
 export const listFarmers = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
@@ -153,16 +159,63 @@ export const createFarmer = async (req: AuthenticatedRequest, res: Response): Pr
     });
 
     if (!kebele) {
-      res.status(400).json({ success: false, message: 'Invalid Kebele selected / የተመረጠው ቀበሌ አልተገኘም' });
+      res.status(400).json({
+        success: false,
+        code: 'INVALID_KEBELE',
+        field: 'kebeleId',
+        message: 'Invalid Kebele selected / የተመረጠው ቀበሌ አልተገኘም',
+      });
       return;
     }
 
     if (kebele.subCityId && data.subCityId && kebele.subCityId !== data.subCityId) {
       res.status(400).json({
         success: false,
+        code: 'SUB_CITY_MISMATCH',
+        field: 'kebeleId',
         message: 'Validation Error: Selected Kebele does not belong to the selected Sub-City / የተመረጠው ቀበሌ ከተመረጠው ክፍለ ከተማ ጋር አይዛመድም',
       });
       return;
+    }
+
+    // Phone normalization and uniqueness check
+    const normalizedPhone = normalizeEthiopianPhone(data.phone);
+    const cleanedPhone = data.phone.trim().replace(/[\s\-\(\)\.]/g, '');
+    const existingPhone = await prisma.farmer.findFirst({
+      where: {
+        OR: [
+          { phone: normalizedPhone },
+          { phone: data.phone.trim() },
+          { phone: cleanedPhone },
+        ],
+      },
+    });
+
+    if (existingPhone) {
+      res.status(409).json({
+        success: false,
+        code: 'DUPLICATE_PHONE',
+        field: 'phone',
+        message: 'A farmer with this phone number is already registered / በዚህ ስልክ ቁጥር የተመዘገበ አርሶ አደር አስቀድሞ አለ',
+      });
+      return;
+    }
+
+    // National ID uniqueness pre-check (if provided)
+    if (data.nationalId) {
+      const existingNationalId = await prisma.farmer.findFirst({
+        where: { nationalId: data.nationalId },
+      });
+
+      if (existingNationalId) {
+        res.status(409).json({
+          success: false,
+          code: 'DUPLICATE_NATIONAL_ID',
+          field: 'nationalId',
+          message: 'A farmer with this National/Kebele ID is already registered / በዚህ መታወቂያ ቁጥር የተመዘገበ አርሶ አደር አስቀድሞ አለ',
+        });
+        return;
+      }
     }
 
     const normalizedGender =
@@ -183,8 +236,8 @@ export const createFarmer = async (req: AuthenticatedRequest, res: Response): Pr
         farmerCode,
         fullName: data.fullName,
         gender: normalizedGender,
-        phone: data.phone,
-        nationalId: data.nationalId || null,
+        phone: normalizedPhone,
+        nationalId: data.nationalId, // Guaranteed null or uppercase string by Zod
         photoUrl,
         subCityId: data.subCityId,
         kebeleId: data.kebeleId,
@@ -239,11 +292,65 @@ export const createFarmer = async (req: AuthenticatedRequest, res: Response): Pr
     });
   } catch (error: any) {
     console.error('Farmer registration error:', error);
-    if (error.errors) {
-      res.status(400).json({ success: false, message: error.errors[0]?.message || 'Validation failed', errors: error.errors });
+
+    // 1. Zod Validation Errors
+    if (error.errors && Array.isArray(error.errors)) {
+      const firstError = error.errors[0];
+      const field = firstError?.path && firstError.path.length > 0 ? String(firstError.path[0]) : undefined;
+      res.status(400).json({
+        success: false,
+        code: 'VALIDATION_ERROR',
+        field,
+        message: firstError?.message || 'Validation failed / የማረጋገጫ ስህተት',
+        errors: error.errors,
+      });
       return;
     }
-    res.status(500).json({ success: false, message: 'Failed to register farmer', error });
+
+    // 2. Prisma P2002 Unique Constraint Violation
+    if (error.code === 'P2002') {
+      const target = String(error.meta?.target || '');
+      if (target.includes('nationalId') || target.includes('national_id')) {
+        res.status(409).json({
+          success: false,
+          code: 'DUPLICATE_NATIONAL_ID',
+          field: 'nationalId',
+          message: 'A farmer with this National/Kebele ID is already registered / በዚህ መታወቂያ ቁጥር የተመዘገበ አርሶ አደር አስቀድሞ አለ',
+        });
+        return;
+      }
+      if (target.includes('phone')) {
+        res.status(409).json({
+          success: false,
+          code: 'DUPLICATE_PHONE',
+          field: 'phone',
+          message: 'A farmer with this phone number is already registered / በዚህ ስልክ ቁጥር የተመዘገበ አርሶ አደር አስቀድሞ አለ',
+        });
+        return;
+      }
+      if (target.includes('farmerCode') || target.includes('farmer_code')) {
+        res.status(409).json({
+          success: false,
+          code: 'DUPLICATE_FARMER_CODE',
+          field: 'farmerCode',
+          message: 'Farmer code generation collision occurred, please retry / የአርሶ አደር መለያ ተደራራቢ ሆኗል፣ እባክዎ እንደገና ይሞክሩ',
+        });
+        return;
+      }
+      res.status(409).json({
+        success: false,
+        code: 'DUPLICATE_RECORD',
+        message: 'A duplicate record already exists in the system / ተደራራቢ መረጃ አስቀድሞ ተመዝግቧል',
+      });
+      return;
+    }
+
+    // 3. Generic Server Error - sanitize and avoid leaking stack traces or internal drivers
+    res.status(500).json({
+      success: false,
+      code: 'SERVER_ERROR',
+      message: 'Failed to register farmer / አርሶ አደሩን መመዝገብ አልተቻለም',
+    });
   }
 };
 
@@ -258,11 +365,59 @@ export const updateFarmer = async (req: AuthenticatedRequest, res: Response): Pr
     });
 
     if (!existing) {
-      res.status(404).json({ success: false, message: 'Farmer not found' });
+      res.status(404).json({ success: false, message: 'Farmer not found / አርሶ አደሩ አልተገኘም' });
       return;
     }
 
-    const updated = await prisma.$transaction(async (tx) => {
+    // If phone is being updated, validate uniqueness against other farmers
+    let normalizedPhone: string | undefined = undefined;
+    if (data.phone) {
+      normalizedPhone = normalizeEthiopianPhone(data.phone);
+      const cleanedPhone = data.phone.trim().replace(/[\s\-\(\)\.]/g, '');
+      const existingPhone = await prisma.farmer.findFirst({
+        where: {
+          id: { not: id },
+          OR: [
+            { phone: normalizedPhone },
+            { phone: data.phone.trim() },
+            { phone: cleanedPhone },
+          ],
+        },
+      });
+
+      if (existingPhone) {
+        res.status(409).json({
+          success: false,
+          code: 'DUPLICATE_PHONE',
+          field: 'phone',
+          message: 'A farmer with this phone number is already registered / በዚህ ስልክ ቁጥር የተመዘገበ አርሶ አደር አስቀድሞ አለ',
+        });
+        return;
+      }
+    }
+
+    // If nationalId is being updated and non-null, validate uniqueness against other farmers
+    if (data.nationalId) {
+      const existingNationalId = await prisma.farmer.findFirst({
+        where: {
+          id: { not: id },
+          nationalId: data.nationalId,
+        },
+      });
+
+      if (existingNationalId) {
+        res.status(409).json({
+          success: false,
+          code: 'DUPLICATE_NATIONAL_ID',
+          field: 'nationalId',
+          message: 'A farmer with this National/Kebele ID is already registered / በዚህ መታወቂያ ቁጥር የተመዘገበ አርሶ አደር አስቀድሞ አለ',
+        });
+        return;
+      }
+    }
+
+    const updated = await prisma.$transaction(
+      async (tx) => {
       // If status changed to suspended, also update card status if needed
       if (data.eligibilityStatus === 'SUSPENDED' && existing.eligibilityStatus !== 'SUSPENDED') {
         await tx.farmerCard.updateMany({
@@ -318,8 +473,8 @@ export const updateFarmer = async (req: AuthenticatedRequest, res: Response): Pr
         data: {
           fullName: data.fullName,
           gender: normalizedGender,
-          phone: data.phone,
-          nationalId: data.nationalId,
+          phone: normalizedPhone !== undefined ? normalizedPhone : existing.phone,
+          nationalId: data.nationalId !== undefined ? data.nationalId : existing.nationalId,
           photoUrl,
           subCityId: data.subCityId || existing.subCityId,
           kebeleId: data.kebeleId || existing.kebeleId,
@@ -363,7 +518,7 @@ export const updateFarmer = async (req: AuthenticatedRequest, res: Response): Pr
           cards: true,
         },
       });
-    });
+    }, { maxWait: 10000, timeout: 20000 });
 
     await logAudit({
       userId: req.user?.userId,
@@ -379,8 +534,57 @@ export const updateFarmer = async (req: AuthenticatedRequest, res: Response): Pr
       message: 'Farmer profile updated successfully',
       farmer: updated,
     });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Failed to update farmer profile', error });
+  } catch (error: any) {
+    console.error('Farmer update error:', error);
+
+    // 1. Zod Validation Errors
+    if (error.errors && Array.isArray(error.errors)) {
+      const firstError = error.errors[0];
+      const field = firstError?.path && firstError.path.length > 0 ? String(firstError.path[0]) : undefined;
+      res.status(400).json({
+        success: false,
+        code: 'VALIDATION_ERROR',
+        field,
+        message: firstError?.message || 'Validation failed / የማረጋገጫ ስህተት',
+        errors: error.errors,
+      });
+      return;
+    }
+
+    // 2. Prisma P2002 Unique Constraint Violation
+    if (error.code === 'P2002') {
+      const target = String(error.meta?.target || '');
+      if (target.includes('nationalId') || target.includes('national_id')) {
+        res.status(409).json({
+          success: false,
+          code: 'DUPLICATE_NATIONAL_ID',
+          field: 'nationalId',
+          message: 'A farmer with this National/Kebele ID is already registered / በዚህ መታወቂያ ቁጥር የተመዘገበ አርሶ አደር አስቀድሞ አለ',
+        });
+        return;
+      }
+      if (target.includes('phone')) {
+        res.status(409).json({
+          success: false,
+          code: 'DUPLICATE_PHONE',
+          field: 'phone',
+          message: 'A farmer with this phone number is already registered / በዚህ ስልክ ቁጥር የተመዘገበ አርሶ አደር አስቀድሞ አለ',
+        });
+        return;
+      }
+      res.status(409).json({
+        success: false,
+        code: 'DUPLICATE_RECORD',
+        message: 'A duplicate record already exists in the system / ተደራራቢ መረጃ አስቀድሞ ተመዝግቧል',
+      });
+      return;
+    }
+
+    res.status(500).json({
+      success: false,
+      code: 'SERVER_ERROR',
+      message: error.message || 'Failed to update farmer profile / የአርሶ አደር መረጃ ማዘመን አልተቻለም',
+    });
   }
 };
 
@@ -612,5 +816,157 @@ export const logCardPrint = async (req: AuthenticatedRequest, res: Response): Pr
     });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to log card print', error });
+  }
+};
+
+/**
+ * Helper to safely resolve the farmer uploads directory
+ */
+const getFarmerUploadDir = (): string => {
+  const candidates = [
+    path.resolve(process.cwd(), 'uploads/farmers'),
+    path.resolve(process.cwd(), 'server/uploads/farmers'),
+  ];
+  for (const dir of candidates) {
+    if (fs.existsSync(dir)) return dir;
+  }
+  return candidates[0];
+};
+
+/**
+ * Helper to safely stream a photo with security headers
+ */
+const sendSafePhoto = (filePath: string, res: Response): void => {
+  const ext = path.extname(filePath).toLowerCase();
+  const mimeTypes: Record<string, string> = {
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.png': 'image/png',
+    '.webp': 'image/webp',
+  };
+  const contentType = mimeTypes[ext] || 'image/jpeg';
+
+  res.setHeader('Content-Type', contentType);
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Cache-Control', 'private, no-transform, max-age=3600');
+  res.setHeader('Content-Security-Policy', "default-src 'none'");
+
+  res.sendFile(filePath);
+};
+
+/**
+ * GET /api/farmers/:id/photo
+ * Securely streams a farmer's photo by Farmer ID or Farmer Code
+ */
+export const getFarmerPhoto = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    if (!id || typeof id !== 'string') {
+      res.status(400).json({ success: false, message: 'Invalid farmer identifier.' });
+      return;
+    }
+
+    const farmer = await prisma.farmer.findFirst({
+      where: {
+        OR: [{ id }, { farmerCode: id }],
+      },
+      select: {
+        id: true,
+        farmerCode: true,
+        photoUrl: true,
+      },
+    });
+
+    if (!farmer) {
+      res.status(404).json({ success: false, message: 'Farmer not found.' });
+      return;
+    }
+
+    if (!farmer.photoUrl) {
+      res.status(404).json({ success: false, message: 'Farmer has no photo uploaded.' });
+      return;
+    }
+
+    const filename = path.basename(farmer.photoUrl);
+    const safeFilenameRegex = /^[a-zA-Z0-9_\-]+\.(jpg|jpeg|png|webp)$/i;
+    if (!safeFilenameRegex.test(filename)) {
+      res.status(400).json({ success: false, message: 'Invalid photo filename.' });
+      return;
+    }
+
+    const uploadDir = getFarmerUploadDir();
+    const filePath = path.resolve(uploadDir, filename);
+
+    // Path confinement check
+    if (!filePath.startsWith(uploadDir)) {
+      res.status(400).json({ success: false, message: 'Directory traversal attempt detected.' });
+      return;
+    }
+
+    if (!fs.existsSync(filePath)) {
+      res.status(404).json({ success: false, message: 'Photo file not found on disk.' });
+      return;
+    }
+
+    sendSafePhoto(filePath, res);
+  } catch (error: any) {
+    console.error('Error serving farmer photo by ID:', error);
+    res.status(500).json({ success: false, message: 'Failed to retrieve farmer photo.', error: error?.message });
+  }
+};
+
+/**
+ * GET /api/farmers/photo/:filename
+ * Securely streams a farmer's photo by filename with strict validation
+ */
+export const getFarmerPhotoByFilename = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { filename } = req.params;
+
+    if (!filename || typeof filename !== 'string') {
+      res.status(400).json({ success: false, message: 'Filename parameter is required.' });
+      return;
+    }
+
+    // Strict filename format validation: only alphanumeric, underscore, hyphen, and valid extension
+    const safeFilenameRegex = /^[a-zA-Z0-9_\-]+\.(jpg|jpeg|png|webp)$/i;
+    if (!safeFilenameRegex.test(filename)) {
+      res.status(400).json({ success: false, message: 'Invalid or malformed photo filename.' });
+      return;
+    }
+
+    const cleanFilename = path.basename(filename);
+    const uploadDir = getFarmerUploadDir();
+    const filePath = path.resolve(uploadDir, cleanFilename);
+
+    // Path confinement check
+    if (!filePath.startsWith(uploadDir)) {
+      res.status(400).json({ success: false, message: 'Directory traversal attempt detected.' });
+      return;
+    }
+
+    // Ensure photo belongs to a legitimate farmer in the system (no arbitrary file browsing)
+    const farmerWithPhoto = await prisma.farmer.findFirst({
+      where: {
+        photoUrl: { contains: cleanFilename },
+      },
+      select: { id: true },
+    });
+
+    if (!farmerWithPhoto) {
+      res.status(404).json({ success: false, message: 'Photo not associated with any registered farmer.' });
+      return;
+    }
+
+    if (!fs.existsSync(filePath)) {
+      res.status(404).json({ success: false, message: 'Photo file not found on disk.' });
+      return;
+    }
+
+    sendSafePhoto(filePath, res);
+  } catch (error: any) {
+    console.error('Error serving farmer photo by filename:', error);
+    res.status(500).json({ success: false, message: 'Failed to retrieve farmer photo.', error: error?.message });
   }
 };

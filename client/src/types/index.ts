@@ -26,12 +26,14 @@ export interface User {
   fullName: string;
   avatarUrl?: string | null;
   role: UserRole;
+  officeId?: string | null;
   office?: {
     id: string;
     name: string;
     code: string;
     type: string;
   } | null;
+  fuelStationId?: string | null;
   fuelStation?: {
     id: string;
     name: string;
@@ -161,6 +163,24 @@ export interface FuelRequestItem {
   remarks?: string | null;
 }
 
+export interface FuelRequestHistory {
+  id: string;
+  fuelRequestId: string;
+  action: string;
+  fromStatus?: RequestStatus | null;
+  toStatus: RequestStatus;
+  actorId: string;
+  actor: {
+    id: string;
+    fullName: string;
+    username: string;
+    role: string;
+  };
+  feedback?: string | null;
+  snapshotData?: string | null;
+  createdAt: string;
+}
+
 export interface FuelRequest {
   id: string;
   requestNumber: string;
@@ -185,6 +205,7 @@ export interface FuelRequest {
   reviewedAt?: string | null;
   reviewRemarks?: string | null;
   items?: FuelRequestItem[];
+  history?: FuelRequestHistory[];
 }
 
 export interface FuelAuthorization {

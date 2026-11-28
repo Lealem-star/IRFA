@@ -84,6 +84,23 @@ enum VerificationResult {
   REJECTED
 }
 
+enum ShortageCategory {
+  FUEL_SUPPLY_SHORTAGE
+  TEMPORARY_STATION_CLOSURE
+  FUEL_TYPE_UNAVAILABLE
+  DISTRIBUTION_INTERRUPTION
+  TECHNICAL_STATION_PROBLEM
+  OTHER
+}
+
+enum ShortageStatus {
+  REPORTED
+  UNDER_REVIEW
+  CONFIRMED
+  RESOLVED
+  REJECTED
+}
+
 model Office {
   id           String    @id @default(uuid())
   code         String    @unique
@@ -98,46 +115,54 @@ model Office {
 }
 
 model FuelStation {
-  id                String             @id @default(uuid())
-  code              String             @unique
-  name              String
-  location          String
-  contactPerson     String?
-  phone             String?
-  licenseNumber     String?
-  isActive          Boolean            @default(true)
-  users             User[]
-  assignments       StationAssignment[]
-  transactions      FuelTransaction[]
-  verificationLogs  VerificationLog[]
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
+  id                  String                     @id @default(uuid())
+  code                String                     @unique
+  name                String
+  location            String
+  contactPerson       String?
+  phone               String?
+  licenseNumber       String?
+  isActive            Boolean                    @default(true)
+  createdAt           DateTime                   @default(now())
+  updatedAt           DateTime                   @updatedAt
+  company             String?
+  nameAmharic         String?
+  users               User[]
+  subCityAssignments  StationSubCityAssignment[]
+  assignments         StationAssignment[]
+  transactions        FuelTransaction[]
+  verificationLogs    VerificationLog[]
+  shortages           FuelShortage[]
 
   @@map("fuel_stations")
 }
 
 model User {
-  id                 String             @id @default(uuid())
-  username           String             @unique
-  email              String?            @unique
-  passwordHash       String
-  fullName           String
-  avatarUrl          String?
-  role               UserRole
-  officeId           String?
-  office             Office?            @relation(fields: [officeId], references: [id])
-  fuelStationId      String?
-  fuelStation        FuelStation?       @relation(fields: [fuelStationId], references: [id])
-  isActive           Boolean            @default(true)
-  lastLoginAt        DateTime?
-  submittedRequests  FuelRequest[]      @relation("SubmittedBy")
-  reviewedRequests   FuelRequest[]      @relation("ReviewedBy")
-  fuelTransactions   FuelTransaction[]
-  assignedStations   StationAssignment[]
-  verificationLogs   VerificationLog[]
-  auditLogs          AuditLog[]
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
+  id                         String                     @id @default(uuid())
+  username                   String                     @unique
+  email                      String?                    @unique
+  passwordHash               String
+  fullName                   String
+  role                       UserRole
+  officeId                   String?
+  office                     Office?                    @relation(fields: [officeId], references: [id])
+  fuelStationId              String?
+  fuelStation                FuelStation?               @relation(fields: [fuelStationId], references: [id])
+  isActive                   Boolean                    @default(true)
+  lastLoginAt                DateTime?
+  createdAt                  DateTime                   @default(now())
+  updatedAt                  DateTime                   @updatedAt
+  avatarUrl                  String?
+  submittedRequests          FuelRequest[]              @relation("SubmittedBy")
+  reviewedRequests           FuelRequest[]              @relation("ReviewedBy")
+  fuelTransactions           FuelTransaction[]
+  assignedStations           StationAssignment[]
+  stationSubCityAssignments  StationSubCityAssignment[]
+  verificationLogs           VerificationLog[]
+  auditLogs                  AuditLog[]
+  requestHistories           FuelRequestHistory[]
+  reportedShortages          FuelShortage[]             @relation("ReportedShortages")
+  reviewedShortages          FuelShortage[]             @relation("ReviewedShortages")
 
   @@index([role])
   @@map("users")
@@ -155,14 +180,15 @@ model Location {
 }
 
 model SubCity {
-  id          String    @id @default(uuid())
-  code        String    @unique
-  name        String    @unique
-  nameAmharic String?
-  kebeles     Kebele[]
-  farmers     Farmer[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id                 String                     @id @default(uuid())
+  code               String                     @unique
+  name               String                     @unique
+  nameAmharic        String?
+  kebeles            Kebele[]
+  farmers            Farmer[]
+  stationAssignments StationSubCityAssignment[]
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @updatedAt
 
   @@map("sub_cities")
 }
@@ -195,6 +221,7 @@ model FuelType {
   requestItems         FuelRequestItem[]
   authorizations       FuelAuthorization[]
   transactions         FuelTransaction[]
+  shortages            FuelShortage[]
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
 
@@ -205,18 +232,20 @@ model Farmer {
   id                 String                   @id @default(uuid())
   farmerCode         String                   @unique
   fullName           String
-  gender             String?
   phone              String
   nationalId         String?                  @unique
   photoUrl           String?
-  subCityId          String?
-  subCity            SubCity?                 @relation(fields: [subCityId], references: [id])
   kebeleId           String
   kebele             Kebele                   @relation(fields: [kebeleId], references: [id])
-  declaredFuelLiters Decimal?                 @db.Decimal(10, 2)
   eligibilityStatus  EligibilityStatus        @default(ELIGIBLE)
   isActive           Boolean                  @default(true)
   suspensionReason   String?
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+  declaredFuelLiters Decimal?                 @db.Decimal(10, 2)
+  gender             String?
+  subCityId          String?
+  subCity            SubCity?                 @relation(fields: [subCityId], references: [id])
   irrigationProfile  FarmerIrrigationProfile?
   cards              FarmerCard[]
   allocations        MonthlyAllocation[]
@@ -224,8 +253,6 @@ model Farmer {
   authorizations     FuelAuthorization[]
   transactions       FuelTransaction[]
   verificationLogs   VerificationLog[]
-  createdAt          DateTime                 @default(now())
-  updatedAt          DateTime                 @updatedAt
 
   @@index([farmerCode])
   @@index([eligibilityStatus])
@@ -244,10 +271,10 @@ model FarmerIrrigationProfile {
   pumpHorsepower     String?
   pumpModel          String?
   primaryCrops       String?
-  declaredFuelLiters Decimal?     @db.Decimal(10, 2)
   irrigationSeason   String?
   createdAt          DateTime     @default(now())
   updatedAt          DateTime     @updatedAt
+  declaredFuelLiters Decimal?     @db.Decimal(10, 2)
 
   @@map("farmer_irrigation_profiles")
 }
@@ -310,12 +337,32 @@ model FuelRequest {
   reviewRemarks       String?            @db.Text
   items               FuelRequestItem[]
   authorizations      FuelAuthorization[]
+  history             FuelRequestHistory[]
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
 
   @@index([status])
   @@index([periodMonth, periodYear])
   @@map("fuel_requests")
+}
+
+model FuelRequestHistory {
+  id              String         @id @default(uuid())
+  fuelRequestId   String
+  fuelRequest     FuelRequest    @relation(fields: [fuelRequestId], references: [id], onDelete: Restrict)
+  action          String
+  fromStatus      RequestStatus?
+  toStatus        RequestStatus
+  actorId         String
+  actor           User           @relation(fields: [actorId], references: [id])
+  feedback        String?        @db.Text
+  snapshotData    String?        @db.Text
+  createdAt       DateTime       @default(now())
+
+  @@index([fuelRequestId])
+  @@index([actorId])
+  @@index([createdAt])
+  @@map("fuel_request_history")
 }
 
 model FuelRequestItem {
@@ -384,6 +431,26 @@ model StationAssignment {
   @@unique([fuelAuthorizationId, fuelStationId])
   @@index([fuelStationId])
   @@map("station_assignments")
+}
+
+model StationSubCityAssignment {
+  id            String            @id @default(uuid())
+  subCityId     String
+  subCity       SubCity           @relation(fields: [subCityId], references: [id], onDelete: Cascade)
+  fuelStationId String
+  fuelStation   FuelStation       @relation(fields: [fuelStationId], references: [id], onDelete: Cascade)
+  assignedById  String
+  assignedBy    User              @relation(fields: [assignedById], references: [id])
+  assignedAt    DateTime          @default(now())
+  status        AssignmentStatus  @default(ACTIVE)
+  notes         String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@unique([subCityId, fuelStationId])
+  @@index([subCityId])
+  @@index([fuelStationId])
+  @@map("station_sub_city_assignments")
 }
 
 model FuelTransaction {
@@ -461,4 +528,32 @@ model SystemSetting {
   updatedAt   DateTime @updatedAt
 
   @@map("system_settings")
+}
+
+model FuelShortage {
+  id                 String           @id @default(uuid())
+  fuelStationId      String
+  fuelStation        FuelStation      @relation(fields: [fuelStationId], references: [id])
+  fuelTypeId         String
+  fuelType           FuelType         @relation(fields: [fuelTypeId], references: [id])
+  reportedById       String
+  reportedBy         User             @relation("ReportedShortages", fields: [reportedById], references: [id])
+  reportedAt         DateTime         @default(now())
+  category           ShortageCategory
+  status             ShortageStatus   @default(REPORTED)
+  estimatedAvailable Decimal?         @db.Decimal(10, 2)
+  estimatedShortage  Decimal?         @db.Decimal(10, 2)
+  description        String           @db.Text
+  notes              String?          @db.Text
+  resolvedAt         DateTime?
+  reviewedById       String?
+  reviewedBy         User?            @relation("ReviewedShortages", fields: [reviewedById], references: [id])
+  reviewRemarks      String?          @db.Text
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  @@index([fuelStationId])
+  @@index([fuelTypeId])
+  @@index([status])
+  @@map("fuel_shortages")
 }
